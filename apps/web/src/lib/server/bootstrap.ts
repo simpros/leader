@@ -52,17 +52,11 @@ export const ensureInitialUserWithOrganization = async () => {
           role: "admin",
         },
       });
-      console.info(
-        `[bootstrap] Initial user created for organization '${BOOTSTRAP_ORGANIZATION_SLUG}': ${BOOTSTRAP_USER_EMAIL}`
-      );
       console.info(`[bootstrap] Initial user password: ${password}`);
-      logger.info(
-        "Initial user created for organization '{slug}': {email}",
-        {
-          slug: BOOTSTRAP_ORGANIZATION_SLUG,
-          email: BOOTSTRAP_USER_EMAIL,
-        }
-      );
+      logger.info("Bootstrap user created", {
+        organization_slug: BOOTSTRAP_ORGANIZATION_SLUG,
+        email: BOOTSTRAP_USER_EMAIL,
+      });
     } catch (error) {
       if (
         !(

@@ -1,10 +1,16 @@
-import { error, redirect, type Handle } from "@sveltejs/kit";
+import {
+  error,
+  isHttpError,
+  isRedirect,
+  redirect,
+  type Handle,
+} from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { building } from "$app/environment";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { auth } from "@leader/auth";
 import { db, eq, runMigrations, schema, withRLS } from "@leader/db";
-import { configureLogging } from "@leader/logging";
+import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
 
 if (!building) {
@@ -12,6 +18,15 @@ if (!building) {
   await runMigrations();
   await ensureInitialUserWithOrganization();
 }
+
+const logger = getLogger(["leader", "web"]);
+
+const envContext = Object.freeze({
+  service: "leader-web",
+  version: process.env.npm_package_version ?? "unknown",
+  commit_hash: process.env.COMMIT_SHA ?? "unknown",
+  environment: process.env.NODE_ENV ?? "development",
+});
 
 const LOGIN_PATH = "/auth/login";
 const LOGIN_ROUTE_ID = "/auth";
@@ -112,7 +127,60 @@ const permissionHandle: Handle = async ({ event, resolve }) => {
   return svelteKitHandler({ event, resolve, auth, building });
 };
 
+const wideEventHandle: Handle = async ({ event, resolve }) => {
+  const startTime = Date.now();
+  const requestId =
+    event.request.headers.get("x-request-id") || crypto.randomUUID();
+
+  const wideEvent: Record<string, unknown> = {
+    request_id: requestId,
+    method: event.request.method,
+    path: event.url.pathname,
+    route_id: event.route.id,
+    ...envContext,
+  };
+
+  event.locals.requestId = requestId;
+  event.locals.wideEvent = wideEvent;
+
+  try {
+    const response = await resolve(event);
+    wideEvent.status_code = response.status;
+    wideEvent.outcome = response.status < 400 ? "success" : "error";
+    response.headers.set("x-request-id", requestId);
+    return response;
+  } catch (err) {
+    if (isRedirect(err)) {
+      wideEvent.status_code = err.status;
+      wideEvent.outcome = "redirect";
+      wideEvent.redirect_location = err.location;
+    } else if (isHttpError(err)) {
+      wideEvent.status_code = err.status;
+      wideEvent.outcome = "error";
+      wideEvent.error = { message: err.body.message };
+    } else {
+      wideEvent.status_code = 500;
+      wideEvent.outcome = "error";
+      wideEvent.error = {
+        type: err instanceof Error ? err.name : "Unknown",
+        message: err instanceof Error ? err.message : String(err),
+      };
+    }
+    throw err;
+  } finally {
+    wideEvent.duration_ms = Date.now() - startTime;
+    if (event.locals.user) {
+      wideEvent.user_id = event.locals.user.id;
+    }
+    if (event.locals.session?.activeOrganizationId) {
+      wideEvent.organization_id = event.locals.session.activeOrganizationId;
+    }
+    logger.info("request {method} {path} {status_code}", wideEvent);
+  }
+};
+
 export const handle = sequence(
+  wideEventHandle,
   requestLocaleHandle,
   sessionHandle,
   permissionHandle

@@ -42,7 +42,7 @@ export const sendEmail = async ({
       text: text || html.replace(/<[^>]*>?/gm, ""), // simple fallback text
     });
     console.log("Message sent: %s", info.messageId);
-    logger.info("Email sent", { messageId: info.messageId, to });
+    logger.info("Email sent", { messageId: info.messageId, to, subject });
     return info;
   } catch (error) {
     logger.error("Failed to send email", {

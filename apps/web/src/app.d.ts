@@ -14,6 +14,8 @@ declare global {
       session: SessionData["session"] | null;
       user: SessionData["user"] | null;
       requestLocale: string;
+      requestId: string;
+      wideEvent: Record<string, unknown>;
       db: TenantDb;
     }
     // interface PageData {}
