@@ -4,9 +4,11 @@ import { building } from "$app/environment";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { auth } from "@leader/auth";
 import { db, eq, runMigrations, schema, withRLS } from "@leader/db";
+import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
 
 if (!building) {
   await runMigrations();
+  await ensureInitialUserWithOrganization();
 }
 
 const LOGIN_PATH = "/auth/login";
