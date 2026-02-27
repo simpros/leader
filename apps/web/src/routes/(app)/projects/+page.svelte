@@ -25,7 +25,9 @@
           >
             <span class="font-mono text-2xl font-bold">+</span>
           </div>
-          <h3 class="text-base font-bold uppercase tracking-wider text-neutral-900">
+          <h3
+            class="text-base font-bold tracking-wider text-neutral-900 uppercase"
+          >
             No projects yet
           </h3>
           <p class="font-mono text-xs text-neutral-500">
@@ -41,14 +43,19 @@
     {:else}
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {#each projects as project (project.id)}
-          <a href={resolve(`/projects/${project.id}`)} class="group block h-full">
+          <a
+            href={resolve(`/projects/${project.id}`)}
+            class="group block h-full"
+          >
             <Card
               variant="flat"
-              class="flex h-full flex-col justify-between p-5 transition-colors group-hover:border-primary-500"
+              class="group-hover:border-primary-500 flex h-full flex-col justify-between p-5 transition-colors"
             >
               <div class="space-y-3">
                 <div class="flex items-start justify-between gap-3">
-                  <h3 class="text-base font-bold uppercase tracking-wide text-neutral-900 group-hover:text-primary-600 transition-colors">
+                  <h3
+                    class="group-hover:text-primary-600 text-base font-bold tracking-wide text-neutral-900 uppercase transition-colors"
+                  >
                     {project.name}
                   </h3>
                   <Badge variant="soft" tone="accent" size="sm">
@@ -57,14 +64,20 @@
                   </Badge>
                 </div>
                 {#if project.description}
-                  <p class="text-sm text-neutral-500 line-clamp-2 leading-relaxed">
+                  <p
+                    class="line-clamp-2 text-sm leading-relaxed text-neutral-500"
+                  >
                     {project.description}
                   </p>
                 {:else}
-                  <p class="font-mono text-xs text-neutral-400 italic">No description</p>
+                  <p class="font-mono text-xs text-neutral-400 italic">
+                    No description
+                  </p>
                 {/if}
               </div>
-              <div class="mt-4 border-t-2 border-neutral-800 pt-3 font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-400 group-hover:text-primary-500 transition-colors">
+              <div
+                class="group-hover:text-primary-500 mt-4 border-t-2 border-neutral-800 pt-3 font-mono text-[10px] font-bold tracking-[0.3em] text-neutral-400 uppercase transition-colors"
+              >
                 View Details →
               </div>
             </Card>

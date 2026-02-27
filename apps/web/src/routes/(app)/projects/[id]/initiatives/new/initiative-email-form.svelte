@@ -99,7 +99,8 @@
 
       try {
         await submit();
-        testSendSuccessMessage = "Test email sent to your signed-in email.";
+        testSendSuccessMessage =
+          "Test email sent to your signed-in email.";
       } catch (error) {
         console.error(error);
         testSendErrorMessage = "Unable to send test email. Try again.";
@@ -129,7 +130,9 @@
     </span>
     <div class="flex items-center gap-2">
       {#if !capabilities.aiGenerationAvailable}
-        <span class="text-xs text-neutral-400">OPENROUTER_API_KEY not set</span>
+        <span class="text-xs text-neutral-400"
+          >OPENROUTER_API_KEY not set</span
+        >
       {/if}
       <Button
         type="button"
@@ -163,11 +166,15 @@
         </label>
         <p class="text-xs text-neutral-500">
           The AI will use available lead placeholders like
-          <code class="rounded bg-neutral-100 px-1 py-0.5 font-mono">{"{{lead.name}}"}</code>
+          <code class="rounded bg-neutral-100 px-1 py-0.5 font-mono"
+            >{"{{lead.name}}"}</code
+          >
           in the generated email.
         </p>
         {#if aiErrorMessage}
-          <p class="rounded-xl border border-destructive-200 bg-destructive-50/90 px-3 py-2 text-sm text-destructive-700">
+          <p
+            class="border-destructive-200 bg-destructive-50/90 text-destructive-700 rounded-xl border px-3 py-2 text-sm"
+          >
             {aiErrorMessage}
           </p>
         {/if}
@@ -214,7 +221,10 @@
   </div>
 </form>
 
-<form class="mt-4 space-y-3 rounded-xl border border-neutral-200 p-4" {...testInitiativeEmailForm}>
+<form
+  class="mt-4 space-y-3 rounded-xl border border-neutral-200 p-4"
+  {...testInitiativeEmailForm}
+>
   <input
     type="hidden"
     name={sendInitiativeTestEmail.fields.projectId.as("text").name}
@@ -236,13 +246,15 @@
       Send Test Email
     </span>
     <p class="text-xs text-neutral-500">
-      Sends the rendered initiative to your signed-in email using the selected lead for variable replacement.
+      Sends the rendered initiative to your signed-in email using the
+      selected lead for variable replacement.
     </p>
   </div>
 
   {#if selectableLeads.length > 0}
     <label class="flex flex-col gap-2">
-      <span class="text-xs font-medium text-neutral-600">Preview lead</span>
+      <span class="text-xs font-medium text-neutral-600">Preview lead</span
+      >
       <select
         name={sendInitiativeTestEmail.fields.leadId.as("text").name}
         bind:value={selectedTestLeadId}
@@ -260,13 +272,17 @@
   {/if}
 
   {#if testSendSuccessMessage}
-    <p class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+    <p
+      class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+    >
       {testSendSuccessMessage}
     </p>
   {/if}
 
   {#if testSendErrorMessage}
-    <p class="rounded-xl border border-destructive-200 bg-destructive-50/90 px-3 py-2 text-sm text-destructive-700">
+    <p
+      class="border-destructive-200 bg-destructive-50/90 text-destructive-700 rounded-xl border px-3 py-2 text-sm"
+    >
       {testSendErrorMessage}
     </p>
   {/if}

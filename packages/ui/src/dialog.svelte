@@ -29,13 +29,11 @@
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
   <Dialog.Portal>
-    <Dialog.Overlay
-      class="fixed inset-0 z-50 bg-[rgba(26,16,8,0.6)]"
-    />
+    <Dialog.Overlay class="fixed inset-0 z-50 bg-[rgba(26,16,8,0.6)]" />
     <Dialog.Content
       {id}
       class={[
-        "fixed top-1/2 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 border-2 border-neutral-800 bg-surface p-0 focus:outline-none",
+        "bg-surface fixed top-1/2 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 border-2 border-neutral-800 p-0 focus:outline-none",
         className,
         restClass,
       ]}

@@ -111,7 +111,10 @@ export function findMissingPlaceholders(
   const tokens = extractPlaceholders(text);
   if (tokens.length === 0) return [];
 
-  const coreAccessors: Record<string, (lead: Lead) => string | null | undefined> = {
+  const coreAccessors: Record<
+    string,
+    (lead: Lead) => string | null | undefined
+  > = {
     "{{lead.name}}": (l) => l.name,
     "{{lead.email}}": (l) => l.email,
     "{{lead.phone}}": (l) => l.phone,
@@ -131,7 +134,9 @@ export function findMissingPlaceholders(
   for (const token of tokens) {
     const accessor = coreAccessors[token];
     if (accessor) {
-      const missing = leads.filter((l) => !accessor(l)?.toString().trim()).length;
+      const missing = leads.filter(
+        (l) => !accessor(l)?.toString().trim()
+      ).length;
       if (missing > 0) results.push({ token, missingCount: missing });
     } else if (knownTokens.has(token)) {
       // Custom fields — we don't have values client-side, skip

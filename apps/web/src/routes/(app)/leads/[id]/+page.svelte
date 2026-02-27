@@ -52,11 +52,7 @@
     }
   );
 
-  const emailSourceOptions = [
-    "",
-    "website",
-    "brave",
-  ] as const;
+  const emailSourceOptions = ["", "website", "brave"] as const;
 
   $effect(() => {
     updateLeadCore.fields.set({
@@ -83,7 +79,9 @@
         ]}
       />
       <div class="flex flex-wrap items-center gap-2">
-        <h1 class="text-2xl font-bold uppercase tracking-tight text-neutral-950">
+        <h1
+          class="text-2xl font-bold tracking-tight text-neutral-950 uppercase"
+        >
           {leadData.lead.name}
         </h1>
         <Badge variant="soft" tone="neutral" size="sm">
@@ -95,7 +93,7 @@
           href={leadData.lead.googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer external"
-          class="text-primary-500 hover:text-primary-600 hover:underline decoration-primary-400 underline-offset-4 inline-block font-mono text-xs font-bold uppercase tracking-wider transition-all"
+          class="text-primary-500 hover:text-primary-600 decoration-primary-400 inline-block font-mono text-xs font-bold tracking-wider uppercase underline-offset-4 transition-all hover:underline"
         >
           Open in Google Maps →
         </a>
@@ -103,12 +101,22 @@
       <div class="flex flex-wrap items-center gap-2 pt-1">
         {#if confirmingDelete}
           <div class="flex items-center gap-2">
-            <span class="font-mono text-xs font-bold text-red-700">Delete this lead from all projects?</span>
+            <span class="font-mono text-xs font-bold text-red-700"
+              >Delete this lead from all projects?</span
+            >
             <form {...deleteForm}>
               <input
-                {...deleteLead.fields.leadId.as("hidden", leadData.lead.id)}
+                {...deleteLead.fields.leadId.as(
+                  "hidden",
+                  leadData.lead.id
+                )}
               />
-              <Button type="submit" size="sm" color="secondary" disabled={isDeleting}>
+              <Button
+                type="submit"
+                size="sm"
+                color="secondary"
+                disabled={isDeleting}
+              >
                 {isDeleting ? "Deleting…" : "Confirm Delete"}
               </Button>
             </form>
@@ -144,7 +152,11 @@
     <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
       <Card variant="flat" class="space-y-4 p-5">
         <div class="space-y-1">
-          <h2 class="text-lg font-bold uppercase tracking-wider text-neutral-950">Core Fields</h2>
+          <h2
+            class="text-lg font-bold tracking-wider text-neutral-950 uppercase"
+          >
+            Core Fields
+          </h2>
           <p class="font-mono text-xs text-neutral-500">
             Changes here update this lead everywhere it appears.
           </p>
@@ -152,7 +164,10 @@
 
         <form class="space-y-3" {...coreForm}>
           <input
-            {...updateLeadCore.fields.leadId.as("hidden", leadData.lead.id)}
+            {...updateLeadCore.fields.leadId.as(
+              "hidden",
+              leadData.lead.id
+            )}
           />
 
           <Field.Field>
@@ -221,13 +236,14 @@
           </Field.Field>
 
           <label class="flex flex-col gap-2">
-            <span class="font-mono text-xs font-bold uppercase tracking-wider text-neutral-800"
+            <span
+              class="font-mono text-xs font-bold tracking-wider text-neutral-800 uppercase"
               >Email Source</span
             >
             <select
               name={updateLeadCore.fields.emailSource.as("text").name}
               value={leadData.lead.emailSource ?? ""}
-              class="border-2 border-neutral-800 focus-visible:border-primary-600 focus-visible:ring-primary-400/40 h-10 w-full bg-surface px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 ring-offset-background focus-visible:outline-none"
+              class="focus-visible:border-primary-600 focus-visible:ring-primary-400/40 bg-surface ring-offset-background h-10 w-full border-2 border-neutral-800 px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               {#each emailSourceOptions as source (source)}
                 <option value={source}>
@@ -236,7 +252,9 @@
               {/each}
             </select>
             {#if updateLeadCore.fields.emailSource.issues()}
-              <p class="font-mono text-xs font-bold uppercase text-destructive-600">
+              <p
+                class="text-destructive-600 font-mono text-xs font-bold uppercase"
+              >
                 {updateLeadCore.fields.emailSource.issues()?.[0]?.message}
               </p>
             {/if}
@@ -252,7 +270,9 @@
 
       <Card variant="flat" class="space-y-4 p-5">
         <div class="space-y-1">
-          <h2 class="text-lg font-bold uppercase tracking-wider text-neutral-950">
+          <h2
+            class="text-lg font-bold tracking-wider text-neutral-950 uppercase"
+          >
             Custom Fields
           </h2>
           <p class="font-mono text-xs text-neutral-500">
@@ -260,10 +280,7 @@
           </p>
         </div>
 
-        <form
-          class="space-y-3"
-          {...createFieldForm}
-        >
+        <form class="space-y-3" {...createFieldForm}>
           <input
             {...createProjectCustomField.fields.leadId.as(
               "hidden",
@@ -280,18 +297,21 @@
             />
             {#if createProjectCustomField.fields.name.issues()}
               <Field.Error>
-                {createProjectCustomField.fields.name.issues()?.[0]?.message}
+                {createProjectCustomField.fields.name.issues()?.[0]
+                  ?.message}
               </Field.Error>
             {/if}
           </Field.Field>
 
           <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
             <label class="flex flex-col gap-2">
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-neutral-800">
+              <span
+                class="font-mono text-xs font-bold tracking-wider text-neutral-800 uppercase"
+              >
                 Project
               </span>
               <select
-                class="border-2 border-neutral-800 focus-visible:border-primary-600 focus-visible:ring-primary-400/40 h-10 w-full bg-surface px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 ring-offset-background focus-visible:outline-none"
+                class="focus-visible:border-primary-600 focus-visible:ring-primary-400/40 bg-surface ring-offset-background h-10 w-full border-2 border-neutral-800 px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 {...createProjectCustomField.fields.projectId.as("text")}
               >
                 {#each leadData.customFieldSections as section (section.projectId)}
@@ -354,7 +374,7 @@
 
                       <label
                         for={field.id}
-                        class="self-center font-mono text-xs font-bold uppercase tracking-wider text-neutral-800"
+                        class="self-center font-mono text-xs font-bold tracking-wider text-neutral-800 uppercase"
                       >
                         {field.name}
                       </label>

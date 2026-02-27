@@ -36,12 +36,15 @@
   };
 </script>
 
-<main class="leader-page flex min-h-screen items-center justify-center py-10">
+<main
+  class="leader-page flex min-h-screen items-center justify-center py-10"
+>
   <Card variant="flat" class="w-full max-w-md space-y-6 p-6 sm:p-8">
     <header class="space-y-2">
       <h1 class="text-2xl font-semibold text-neutral-900">Sign in</h1>
       <p class="leader-copy">
-        Use your email and password to continue managing projects and leads.
+        Use your email and password to continue managing projects and
+        leads.
       </p>
     </header>
 
@@ -61,8 +64,9 @@
       </div>
 
       <div class="space-y-2">
-        <label class="text-sm font-semibold text-neutral-700" for="password"
-          >Password</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="password">Password</label
         >
         <Input
           id="password"

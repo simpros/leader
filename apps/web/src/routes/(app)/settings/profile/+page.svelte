@@ -95,14 +95,15 @@
 <div class="flex flex-col gap-8">
   <Card variant="flat" class="p-6">
     <h2
-      class="mb-4 text-lg font-bold uppercase tracking-tight text-neutral-950"
+      class="mb-4 text-lg font-bold tracking-tight text-neutral-950 uppercase"
     >
       Profile
     </h2>
     <form class="flex flex-col gap-4" onsubmit={handleProfileSubmit}>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="profile-name"
-          >Name</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="profile-name">Name</label
         >
         <Input id="profile-name" bind:value={name} required />
       </div>
@@ -116,7 +117,9 @@
           value={page.data.user?.email ?? ""}
           disabled
         />
-        <p class="text-xs text-neutral-400">Email cannot be changed here.</p>
+        <p class="text-xs text-neutral-400">
+          Email cannot be changed here.
+        </p>
       </div>
       {#if profileMessage}
         <p
@@ -140,7 +143,7 @@
 
   <Card variant="flat" class="p-6">
     <h2
-      class="mb-4 text-lg font-bold uppercase tracking-tight text-neutral-950"
+      class="mb-4 text-lg font-bold tracking-tight text-neutral-950 uppercase"
     >
       Change Password
     </h2>
@@ -159,8 +162,9 @@
         />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="new-password"
-          >New Password</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="new-password">New Password</label
         >
         <Input
           id="new-password"

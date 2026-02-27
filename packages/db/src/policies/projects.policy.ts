@@ -9,6 +9,9 @@ export const projectPolicies = {
     createOrganizationPolicy("project_org_policy", table.organizationId),
   ],
   projectCustomField: (table: OrgScopedTable) => [
-    createOrganizationPolicy("projectCustomField_org_policy", table.organizationId),
+    createOrganizationPolicy(
+      "projectCustomField_org_policy",
+      table.organizationId
+    ),
   ],
 };

@@ -24,7 +24,12 @@
     userId: string;
     role: string;
     createdAt: string;
-    user: { id: string; name: string; email: string; image: string | null };
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      image: string | null;
+    };
   };
 
   let members = $state<OrgMember[]>([]);
@@ -141,7 +146,10 @@
     }
   };
 
-  const handleRemoveMember = async (memberId: string, memberName: string) => {
+  const handleRemoveMember = async (
+    memberId: string,
+    memberName: string
+  ) => {
     if (!confirm(`Remove ${memberName} from the organisation?`)) return;
 
     const { error } = await authClient.organization.removeMember({
@@ -160,20 +168,22 @@
 <div class="flex flex-col gap-8">
   <Card variant="flat" class="p-6">
     <h2
-      class="mb-4 text-lg font-bold uppercase tracking-tight text-neutral-950"
+      class="mb-4 text-lg font-bold tracking-tight text-neutral-950 uppercase"
     >
       Organisation Details
     </h2>
     <form class="flex flex-col gap-4" onsubmit={handleOrgSubmit}>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="org-name"
-          >Name</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="org-name">Name</label
         >
         <Input id="org-name" bind:value={orgName} required />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="org-slug"
-          >Slug</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="org-slug">Slug</label
         >
         <Input id="org-slug" bind:value={orgSlug} required />
         <p class="text-xs text-neutral-400">
@@ -202,7 +212,7 @@
 
   <Card variant="flat" class="p-6">
     <h2
-      class="mb-4 text-lg font-bold uppercase tracking-tight text-neutral-950"
+      class="mb-4 text-lg font-bold tracking-tight text-neutral-950 uppercase"
     >
       Members
     </h2>
@@ -216,19 +226,19 @@
           <thead>
             <tr class="border-b-2 border-neutral-800">
               <th
-                class="pb-2 pr-4 font-mono text-xs font-bold uppercase tracking-wider text-neutral-600"
+                class="pr-4 pb-2 font-mono text-xs font-bold tracking-wider text-neutral-600 uppercase"
                 >Name</th
               >
               <th
-                class="pb-2 pr-4 font-mono text-xs font-bold uppercase tracking-wider text-neutral-600"
+                class="pr-4 pb-2 font-mono text-xs font-bold tracking-wider text-neutral-600 uppercase"
                 >Email</th
               >
               <th
-                class="pb-2 pr-4 font-mono text-xs font-bold uppercase tracking-wider text-neutral-600"
+                class="pr-4 pb-2 font-mono text-xs font-bold tracking-wider text-neutral-600 uppercase"
                 >Role</th
               >
               <th
-                class="pb-2 font-mono text-xs font-bold uppercase tracking-wider text-neutral-600"
+                class="pb-2 font-mono text-xs font-bold tracking-wider text-neutral-600 uppercase"
               ></th>
             </tr>
           </thead>
@@ -244,12 +254,12 @@
                 <td class="py-3 pr-4">
                   {#if member.role === "owner"}
                     <span
-                      class="font-mono text-xs font-bold uppercase text-neutral-500"
+                      class="font-mono text-xs font-bold text-neutral-500 uppercase"
                       >Owner</span
                     >
                   {:else}
                     <select
-                      class="border-2 border-neutral-800 bg-surface px-2 py-1 font-mono text-xs uppercase"
+                      class="bg-surface border-2 border-neutral-800 px-2 py-1 font-mono text-xs uppercase"
                       value={member.role}
                       onchange={(e) =>
                         handleRoleChange(member.id, e.currentTarget.value)}
@@ -282,14 +292,15 @@
 
   <Card variant="flat" class="p-6">
     <h2
-      class="mb-4 text-lg font-bold uppercase tracking-tight text-neutral-950"
+      class="mb-4 text-lg font-bold tracking-tight text-neutral-950 uppercase"
     >
       Invite Member
     </h2>
     <form class="flex flex-col gap-4" onsubmit={handleInvite}>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="invite-email"
-          >Email Address</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="invite-email">Email Address</label
         >
         <Input
           id="invite-email"
@@ -299,12 +310,13 @@
         />
       </div>
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-neutral-700" for="invite-role"
-          >Role</label
+        <label
+          class="text-sm font-semibold text-neutral-700"
+          for="invite-role">Role</label
         >
         <select
           id="invite-role"
-          class="h-10 border-2 border-neutral-800 bg-surface px-3 text-sm"
+          class="bg-surface h-10 border-2 border-neutral-800 px-3 text-sm"
           bind:value={inviteRole}
         >
           <option value="member">Member</option>

@@ -13,6 +13,6 @@
   }: DescriptionProps = $props();
 </script>
 
-<p class={["text-neutral-500 text-xs", className]} {...restProps}>
+<p class={["text-xs text-neutral-500", className]} {...restProps}>
   {@render children()}
 </p>

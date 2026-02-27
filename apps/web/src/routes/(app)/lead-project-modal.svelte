@@ -57,7 +57,7 @@
       >
         Add leads to a project
       </p>
-      <h2 class="text-xl font-bold font-display text-neutral-900">
+      <h2 class="font-display text-xl font-bold text-neutral-900">
         Choose where to save {selectedCount} lead{selectedCount === 1
           ? ""
           : "s"}

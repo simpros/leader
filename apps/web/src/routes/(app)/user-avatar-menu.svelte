@@ -35,13 +35,13 @@
 
 <DropdownMenu.Root>
   <DropdownMenu.Trigger
-    class="flex size-9 items-center justify-center border-2 border-neutral-800 bg-primary-500 font-mono text-xs font-bold text-white transition-snappy hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/40 focus-visible:ring-offset-2"
+    class="bg-primary-500 transition-snappy hover:bg-primary-600 focus-visible:ring-primary-400/40 flex size-9 items-center justify-center border-2 border-neutral-800 font-mono text-xs font-bold text-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
   >
     {initials}
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content
-      class="z-50 min-w-56 border-2 border-neutral-800 bg-surface py-1 shadow-lg"
+      class="bg-surface z-50 min-w-56 border-2 border-neutral-800 py-1 shadow-lg"
       sideOffset={4}
       align="end"
     >
@@ -60,7 +60,7 @@
       <DropdownMenu.Separator class="my-1 h-px bg-neutral-200" />
 
       <DropdownMenu.Item
-        class="flex w-full cursor-pointer items-center px-3 py-2 text-sm text-destructive-600 transition-colors hover:bg-destructive-50 focus:bg-destructive-50 focus:outline-none"
+        class="text-destructive-600 hover:bg-destructive-50 focus:bg-destructive-50 flex w-full cursor-pointer items-center px-3 py-2 text-sm transition-colors focus:outline-none"
         disabled={signingOut}
         onSelect={handleSignOut}
       >

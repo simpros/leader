@@ -18,21 +18,28 @@
 </script>
 
 <div class="leader-shell">
-  <header class="sticky top-0 z-40 border-b-4 border-neutral-800 bg-surface">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6">
+  <header
+    class="bg-surface sticky top-0 z-40 border-b-4 border-neutral-800"
+  >
+    <div
+      class="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6"
+    >
       <a
         href={resolve("/")}
-        class="shrink-0 py-3 font-mono text-base font-bold uppercase tracking-[0.2em] text-neutral-950 transition-colors hover:text-primary-600 sm:text-lg sm:tracking-[0.3em]"
+        class="hover:text-primary-600 shrink-0 py-3 font-mono text-base font-bold tracking-[0.2em] text-neutral-950 uppercase transition-colors sm:text-lg sm:tracking-[0.3em]"
       >
         Leader
       </a>
       <div class="flex items-center">
-        <nav class="flex flex-wrap items-center" aria-label="Main navigation">
+        <nav
+          class="flex flex-wrap items-center"
+          aria-label="Main navigation"
+        >
           {#each links as link (link.href)}
             <a
               href={resolve(link.href)}
               class={[
-                "transition-snappy relative border-l-2 border-neutral-800 px-3 py-4 font-mono text-[10px] font-bold uppercase tracking-wider sm:px-5 sm:text-xs",
+                "transition-snappy relative border-l-2 border-neutral-800 px-3 py-4 font-mono text-[10px] font-bold tracking-wider uppercase sm:px-5 sm:text-xs",
                 isActive(link.href)
                   ? "bg-primary-500 text-white"
                   : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950",

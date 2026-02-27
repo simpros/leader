@@ -13,6 +13,12 @@
   }: ErrorProps = $props();
 </script>
 
-<p class={["font-mono text-xs font-bold uppercase text-destructive-600", className]} {...restProps}>
+<p
+  class={[
+    "text-destructive-600 font-mono text-xs font-bold uppercase",
+    className,
+  ]}
+  {...restProps}
+>
   {@render children()}
 </p>

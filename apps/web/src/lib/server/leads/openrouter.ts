@@ -57,18 +57,21 @@ export const getOpenRouterAudienceQueries = async ({
     .filter(Boolean)
     .join("\n");
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: model || "openai/gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
-    }),
-  });
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model || "openai/gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.2,
+      }),
+    }
+  );
 
   if (!response.ok) {
     return buildFallbackQueries(projectDescription, "");

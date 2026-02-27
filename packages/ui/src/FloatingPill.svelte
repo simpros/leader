@@ -21,7 +21,7 @@
 
 <div
   class={[
-    "flex w-fit items-center gap-1 border-2 border-neutral-800 bg-surface px-2 py-1",
+    "bg-surface flex w-fit items-center gap-1 border-2 border-neutral-800 px-2 py-1",
     className,
     restClass,
   ]}

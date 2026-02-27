@@ -141,7 +141,7 @@ body {
   }
 
   .leader-card-soft {
-    @apply border-2 border-neutral-800 bg-surface;
+    @apply bg-surface border-2 border-neutral-800;
   }
 
   .leader-page {
@@ -153,7 +153,7 @@ body {
   }
 
   .leader-surface {
-    @apply border-2 border-neutral-800 bg-surface;
+    @apply bg-surface border-2 border-neutral-800;
   }
 
   .leader-headline {

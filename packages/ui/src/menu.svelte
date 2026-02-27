@@ -125,7 +125,8 @@
         >
           <span class="text-sm font-medium">{item.label}</span>
           {#if item.description}
-            <span class="text-xs text-neutral-400">{item.description}</span>
+            <span class="text-xs text-neutral-400">{item.description}</span
+            >
           {/if}
         </button>
       {/each}

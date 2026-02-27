@@ -139,7 +139,8 @@ export const discoverLeads = form(
     if (!searchTerm && OPENROUTER_API_KEY) {
       source = "google-places+openrouter";
     } else if (!searchTerm && !OPENROUTER_API_KEY) {
-      message = "OPENROUTER_API_KEY not set, using fallback audience extraction.";
+      message =
+        "OPENROUTER_API_KEY not set, using fallback audience extraction.";
     }
 
     const queriesUsed = uniqueStrings(

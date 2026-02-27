@@ -1,9 +1,6 @@
 import * as v from "valibot";
 
-export const optionalEmailSources = [
-  "website",
-  "brave",
-] as const;
+export const optionalEmailSources = ["website", "brave"] as const;
 
 const emptyStringToUndefined = v.transform((value: string) =>
   value === "" ? undefined : value

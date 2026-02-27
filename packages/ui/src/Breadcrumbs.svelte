@@ -12,9 +12,12 @@
 
 <nav
   aria-label="Breadcrumb"
-  class={["flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-500", className]}
+  class={[
+    "flex items-center gap-2 font-mono text-xs tracking-wider text-neutral-500 uppercase",
+    className,
+  ]}
 >
-  <span class="inline-block h-3 w-3 bg-primary-500"></span>
+  <span class="bg-primary-500 inline-block h-3 w-3"></span>
   {#each items as item, i (i)}
     {@const isLast = i === items.length - 1}
     {#if i > 0}
@@ -28,7 +31,7 @@
         {item.label}
       </span>
     {:else}
-      <a href={item.href} class="transition-colors hover:text-primary-600">
+      <a href={item.href} class="hover:text-primary-600 transition-colors">
         {item.label}
       </a>
     {/if}

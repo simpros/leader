@@ -240,7 +240,6 @@
       closeInitiativeDetails();
     }
   };
-
 </script>
 
 <div class="leader-page">
@@ -262,11 +261,11 @@
             )}
           />
           <input
-            class="border-2 border-neutral-800 focus-visible:border-primary-600 focus-visible:ring-primary-400/40 h-10 w-full bg-surface px-3 py-2 text-lg font-bold uppercase tracking-tight text-neutral-950 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 ring-offset-background focus-visible:outline-none"
+            class="focus-visible:border-primary-600 focus-visible:ring-primary-400/40 bg-surface ring-offset-background h-10 w-full border-2 border-neutral-800 px-3 py-2 text-lg font-bold tracking-tight text-neutral-950 uppercase transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             {...updateProject.fields.name.as("text")}
           />
           <input
-            class="border-2 border-neutral-800 focus-visible:border-primary-600 focus-visible:ring-primary-400/40 h-10 w-full bg-surface px-3 py-2 text-sm text-neutral-500 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 ring-offset-background focus-visible:outline-none"
+            class="focus-visible:border-primary-600 focus-visible:ring-primary-400/40 bg-surface ring-offset-background h-10 w-full border-2 border-neutral-800 px-3 py-2 text-sm text-neutral-500 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             placeholder="Description (optional)"
             {...updateProject.fields.description.as("text")}
           />
@@ -294,7 +293,9 @@
         </form>
       {:else}
         <div class="flex flex-wrap items-center gap-2">
-          <h1 class="text-2xl font-bold uppercase tracking-tight text-neutral-950">
+          <h1
+            class="text-2xl font-bold tracking-tight text-neutral-950 uppercase"
+          >
             {projectData.project.name}
           </h1>
           <Badge variant="soft" tone="accent" size="sm">
@@ -318,7 +319,9 @@
           </Button>
           {#if confirmingDelete}
             <div class="flex items-center gap-2">
-              <span class="font-mono text-xs font-bold text-red-700">Delete this project and all its data?</span>
+              <span class="font-mono text-xs font-bold text-red-700"
+                >Delete this project and all its data?</span
+              >
               <form {...deleteForm}>
                 <input
                   {...deleteProject.fields.projectId.as(
@@ -326,7 +329,12 @@
                     projectData.project.id
                   )}
                 />
-                <Button type="submit" size="sm" color="secondary" disabled={isDeleting}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  color="secondary"
+                  disabled={isDeleting}
+                >
                   {isDeleting ? "Deleting…" : "Confirm Delete"}
                 </Button>
               </form>
@@ -366,7 +374,9 @@
       <div class="space-y-4">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="space-y-1">
-            <h2 class="text-lg font-bold uppercase tracking-wider text-neutral-950">
+            <h2
+              class="text-lg font-bold tracking-wider text-neutral-950 uppercase"
+            >
               Initiatives
             </h2>
             <p class="text-sm text-neutral-500">
@@ -390,7 +400,9 @@
           {@const summary = summarizeInitiatives(initiatives)}
           <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Card variant="flat" class="space-y-1 p-4">
-              <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-primary-700">
+              <p
+                class="text-primary-700 font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+              >
                 Initiatives
               </p>
               <p class="font-mono text-3xl font-bold text-neutral-950">
@@ -398,7 +410,9 @@
               </p>
             </Card>
             <Card variant="flat" class="space-y-1 p-4">
-              <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-primary-700">
+              <p
+                class="text-primary-700 font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+              >
                 Drafts
               </p>
               <p class="font-mono text-3xl font-bold text-neutral-950">
@@ -406,7 +420,9 @@
               </p>
             </Card>
             <Card variant="flat" class="space-y-1 p-4">
-              <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-primary-700">
+              <p
+                class="text-primary-700 font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+              >
                 Leads Contacted
               </p>
               <p class="font-mono text-3xl font-bold text-neutral-950">
@@ -414,7 +430,9 @@
               </p>
             </Card>
             <Card variant="flat" class="space-y-1 p-4">
-              <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-primary-700">
+              <p
+                class="text-primary-700 font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
+              >
                 Failed Deliveries
               </p>
               <p class="font-mono text-3xl font-bold text-neutral-950">
@@ -432,14 +450,16 @@
               >
                 <Card
                   variant="flat"
-                  class="space-y-4 p-5 transition-colors group-hover:bg-surface-hover group-active:bg-surface-active"
+                  class="group-hover:bg-surface-hover group-active:bg-surface-active space-y-4 p-5 transition-colors"
                 >
                   <div
                     class="flex flex-wrap items-start justify-between gap-3"
                   >
                     <div class="min-w-0 flex-1 space-y-2">
                       <div class="flex items-center gap-2">
-                        <h3 class="truncate text-base font-bold uppercase tracking-wide text-neutral-900">
+                        <h3
+                          class="truncate text-base font-bold tracking-wide text-neutral-900 uppercase"
+                        >
                           {initiative.title}
                         </h3>
                         {#if initiative.status === "draft"}
@@ -464,7 +484,9 @@
                     <div class="flex flex-wrap items-center gap-2">
                       <Badge variant="soft" tone="accent" size="sm">
                         {initiative.leads.length}
-                        {initiative.leads.length === 1 ? " lead" : " leads"}
+                        {initiative.leads.length === 1
+                          ? " lead"
+                          : " leads"}
                       </Badge>
                       {#if initiative.status === "sent"}
                         <Badge variant="soft" tone="success" size="sm">
@@ -477,8 +499,12 @@
                     </div>
                   </div>
 
-                  <div class="border-2 border-neutral-800 bg-neutral-100 px-3 py-2">
-                    <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-500">
+                  <div
+                    class="border-2 border-neutral-800 bg-neutral-100 px-3 py-2"
+                  >
+                    <p
+                      class="font-mono text-[10px] font-bold tracking-[0.3em] text-neutral-500 uppercase"
+                    >
                       Message preview
                     </p>
                     <p class="mt-1 text-sm text-neutral-600">
@@ -494,14 +520,20 @@
     {:else}
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="space-y-1">
-          <h2 class="text-lg font-bold uppercase tracking-wider text-neutral-950">Leads</h2>
+          <h2
+            class="text-lg font-bold tracking-wider text-neutral-950 uppercase"
+          >
+            Leads
+          </h2>
           <p class="text-sm text-neutral-500">
             Add leads manually or from discovery to this project.
           </p>
         </div>
         <LeadManualCreateForm
           projectId={projectData.project.id}
-          linkedLeadPlaceIds={projectData.leads.map((lead) => lead.placeId)}
+          linkedLeadPlaceIds={projectData.leads.map(
+            (lead) => lead.placeId
+          )}
         />
       </div>
 
@@ -513,7 +545,9 @@
             >
               <span class="font-mono text-2xl font-bold">?</span>
             </div>
-            <h3 class="text-base font-bold uppercase tracking-wider text-neutral-900">
+            <h3
+              class="text-base font-bold tracking-wider text-neutral-900 uppercase"
+            >
               No leads yet
             </h3>
             <p class="font-mono text-xs text-neutral-500">
@@ -526,14 +560,16 @@
           {#each projectData.leads as lead (lead.placeId)}
             <Card
               variant="flat"
-              class="p-5 transition-colors hover:bg-surface-hover active:bg-surface-active"
+              class="hover:bg-surface-hover active:bg-surface-active p-5 transition-colors"
             >
               <div class="space-y-3">
                 <div
                   class="flex flex-wrap items-start justify-between gap-3"
                 >
                   <div class="min-w-0 flex-1 space-y-1.5">
-                    <h3 class="text-base font-bold uppercase tracking-wide text-neutral-900">
+                    <h3
+                      class="text-base font-bold tracking-wide text-neutral-900 uppercase"
+                    >
                       {#if lead.googleMapsUrl}
                         <a
                           href={lead.googleMapsUrl}
@@ -548,7 +584,9 @@
                       {/if}
                     </h3>
                     {#if lead.address}
-                      <p class="text-sm text-neutral-500">{lead.address}</p>
+                      <p class="text-sm text-neutral-500">
+                        {lead.address}
+                      </p>
                     {/if}
                     {#if formatTypes(lead.types)}
                       <p class="text-xs text-neutral-400">
@@ -598,7 +636,7 @@
                 </div>
 
                 <div
-                  class="border-neutral-800 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-2 pt-3 font-mono text-xs"
+                  class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t-2 border-neutral-800 pt-3 font-mono text-xs"
                 >
                   {#if lead.phone}
                     <a
@@ -701,13 +739,17 @@
     transition:fade={{ duration: 120 }}
   >
     <aside
-      class="absolute inset-y-0 right-0 z-50 flex h-full w-full max-w-2xl flex-col border-l-2 border-neutral-800 bg-surface"
+      class="bg-surface absolute inset-y-0 right-0 z-50 flex h-full w-full max-w-2xl flex-col border-l-2 border-neutral-800"
       transition:fly={{ x: 320, duration: 180 }}
     >
-      <div class="flex items-start justify-between gap-3 border-b-2 border-neutral-800 px-6 py-5">
+      <div
+        class="flex items-start justify-between gap-3 border-b-2 border-neutral-800 px-6 py-5"
+      >
         <div class="min-w-0 space-y-2">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="truncate text-lg font-bold uppercase tracking-wide text-neutral-900">
+            <h2
+              class="truncate text-lg font-bold tracking-wide text-neutral-900 uppercase"
+            >
               {selectedInitiative.title}
             </h2>
             {#if selectedInitiative.status === "draft"}
@@ -716,7 +758,9 @@
               <Badge variant="soft" tone="success" size="sm">Sent</Badge>
             {/if}
           </div>
-          <p class="text-sm text-neutral-600">{selectedInitiative.subject}</p>
+          <p class="text-sm text-neutral-600">
+            {selectedInitiative.subject}
+          </p>
           <p class="text-xs text-neutral-500">
             {selectedInitiative.status === "draft"
               ? "Not sent yet"
@@ -736,7 +780,9 @@
 
       <div class="flex-1 space-y-4 overflow-y-auto p-6">
         <div class="border-2 border-neutral-800 bg-neutral-100 px-4 py-3">
-          <p class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-neutral-500">
+          <p
+            class="font-mono text-[10px] font-bold tracking-[0.3em] text-neutral-500 uppercase"
+          >
             Message preview
           </p>
           <p class="mt-1 text-sm whitespace-pre-wrap text-neutral-700">
@@ -746,10 +792,14 @@
 
         {#if selectedInitiative.status === "draft"}
           {#if confirmingInitiativeId === selectedInitiative.id}
-            <div class="border-2 border-secondary-500 bg-secondary-100 px-4 py-3">
-              <p class="mb-3 font-mono text-xs font-bold text-secondary-800">
-                Send this initiative to all leads in this project? This cannot be
-                undone.
+            <div
+              class="border-secondary-500 bg-secondary-100 border-2 px-4 py-3"
+            >
+              <p
+                class="text-secondary-800 mb-3 font-mono text-xs font-bold"
+              >
+                Send this initiative to all leads in this project? This
+                cannot be undone.
               </p>
               {#if sendError}
                 <p class="mb-2 text-xs text-red-600">{sendError}</p>
@@ -780,7 +830,9 @@
               </form>
             </div>
           {:else}
-            <div class="flex items-center justify-between border-2 border-neutral-800 bg-surface px-4 py-3">
+            <div
+              class="bg-surface flex items-center justify-between border-2 border-neutral-800 px-4 py-3"
+            >
               <p class="text-sm text-neutral-600">
                 This initiative is still a draft.
               </p>
@@ -788,7 +840,8 @@
                 variant="ghost"
                 color="neutral"
                 size="sm"
-                onclick={() => (confirmingInitiativeId = selectedInitiative.id)}
+                onclick={() =>
+                  (confirmingInitiativeId = selectedInitiative.id)}
                 disabled={isSending}
               >
                 Send to Leads
@@ -805,7 +858,8 @@
               {countByStatus(selectedInitiative.leads, "sent")} sent
             </Badge>
             <Badge variant="soft" tone="neutral" size="sm">
-              {countByStatus(selectedInitiative.leads, "missing-email")} missing email
+              {countByStatus(selectedInitiative.leads, "missing-email")} missing
+              email
             </Badge>
             <Badge variant="soft" tone="accent" size="sm">
               {countByStatus(selectedInitiative.leads, "error")} failed
@@ -814,15 +868,21 @@
 
           {#if selectedInitiative.leads.length === 0}
             <Card variant="flat" class="p-4 text-center">
-              <p class="text-sm text-neutral-500">No lead deliveries yet.</p>
+              <p class="text-sm text-neutral-500">
+                No lead deliveries yet.
+              </p>
             </Card>
           {:else}
-            <div class="space-y-2 border-2 border-neutral-800 bg-surface p-2">
+            <div
+              class="bg-surface space-y-2 border-2 border-neutral-800 p-2"
+            >
               {#each selectedInitiative.leads as lead (lead.id)}
                 <div
                   class="border-2 border-neutral-800 bg-neutral-100 px-3 py-2"
                 >
-                  <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div
+                    class="flex flex-wrap items-center justify-between gap-2"
+                  >
                     <div class="min-w-0">
                       <a
                         href={resolve(`/leads/${lead.leadId}`)}

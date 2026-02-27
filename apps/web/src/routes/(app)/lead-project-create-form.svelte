@@ -147,7 +147,7 @@
         Description (optional)
       </label>
       <textarea
-        class="border-neutral-200 focus-visible:border-primary-500 focus-visible:ring-primary-500/20 min-h-24 w-full rounded-xl border bg-white px-3 py-2 text-sm text-neutral-900 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none placeholder:text-neutral-400"
+        class="focus-visible:border-primary-500 focus-visible:ring-primary-500/20 min-h-24 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 transition-all duration-200 placeholder:text-neutral-400 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         placeholder="Target audience, notes, or goals"
         {...createProjectWithLeads.fields.description.as("text")}
       ></textarea>

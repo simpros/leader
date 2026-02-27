@@ -12,7 +12,9 @@ export const db = drizzle(databaseUrl, { schema: relations });
 
 export const withRLS = async <T>(
   organizationId: string,
-  callback: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>
+  callback: (
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0]
+  ) => Promise<T>
 ) => {
   return await db.transaction(async (tx) => {
     try {

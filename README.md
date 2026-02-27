@@ -17,16 +17,16 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | [SvelteKit](https://svelte.dev/docs/kit) |
-| Language | TypeScript |
-| Database | PostgreSQL + [Drizzle ORM](https://orm.drizzle.team) |
-| Auth | [Better Auth](https://www.better-auth.com) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com) |
-| Components | [Bits UI](https://bits-ui.com) |
-| Monorepo | [Turborepo](https://turbo.build) + [Bun](https://bun.sh) |
-| Deployment | Docker (Node adapter) |
+| Layer      | Technology                                               |
+| ---------- | -------------------------------------------------------- |
+| Framework  | [SvelteKit](https://svelte.dev/docs/kit)                 |
+| Language   | TypeScript                                               |
+| Database   | PostgreSQL + [Drizzle ORM](https://orm.drizzle.team)     |
+| Auth       | [Better Auth](https://www.better-auth.com)               |
+| Styling    | [Tailwind CSS v4](https://tailwindcss.com)               |
+| Components | [Bits UI](https://bits-ui.com)                           |
+| Monorepo   | [Turborepo](https://turbo.build) + [Bun](https://bun.sh) |
+| Deployment | Docker (Node adapter)                                    |
 
 ## Getting Started
 
@@ -65,19 +65,19 @@ The app is available at [http://localhost:5173](http://localhost:5173).
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `BETTER_AUTH_SECRET` | Yes | Secret key for session encryption |
-| `BETTER_AUTH_BASE_URL` | Yes | Public URL of the app |
-| `GOOGLE_PLACES_API_KEY` | Yes | Google Places API key for lead discovery |
-| `BRAVE_API_KEY` | No | Brave Search API key |
-| `OPENROUTER_API_KEY` | No | OpenRouter API key for AI-powered search |
-| `SMTP_HOST` | No | SMTP server host for sending emails |
-| `SMTP_PORT` | No | SMTP server port |
-| `SMTP_USER` | No | SMTP username |
-| `SMTP_PASS` | No | SMTP password |
-| `EMAIL_FROM` | No | Sender email address |
+| Variable                | Required | Description                              |
+| ----------------------- | -------- | ---------------------------------------- |
+| `DATABASE_URL`          | Yes      | PostgreSQL connection string             |
+| `BETTER_AUTH_SECRET`    | Yes      | Secret key for session encryption        |
+| `BETTER_AUTH_BASE_URL`  | Yes      | Public URL of the app                    |
+| `GOOGLE_PLACES_API_KEY` | Yes      | Google Places API key for lead discovery |
+| `BRAVE_API_KEY`         | No       | Brave Search API key                     |
+| `OPENROUTER_API_KEY`    | No       | OpenRouter API key for AI-powered search |
+| `SMTP_HOST`             | No       | SMTP server host for sending emails      |
+| `SMTP_PORT`             | No       | SMTP server port                         |
+| `SMTP_USER`             | No       | SMTP username                            |
+| `SMTP_PASS`             | No       | SMTP password                            |
+| `EMAIL_FROM`            | No       | Sender email address                     |
 
 See [`.env.example`](.env.example) for defaults.
 

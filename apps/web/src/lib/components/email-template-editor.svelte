@@ -62,7 +62,8 @@
   });
 
   const missingPlaceholders = $derived.by(() => {
-    const combined = (debouncedSubject.current ?? "") + " " + debouncedValue.current;
+    const combined =
+      (debouncedSubject.current ?? "") + " " + debouncedValue.current;
     return findMissingPlaceholders(combined, leads, customFields);
   });
 
@@ -333,15 +334,22 @@
   </div>
 
   {#if missingPlaceholders.length > 0}
-    <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+    <div
+      class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5"
+    >
       <p class="text-sm font-medium text-amber-800">
         ⚠ Some placeholders have missing data
       </p>
       <ul class="mt-1 space-y-0.5">
         {#each missingPlaceholders as { token, missingCount } (token)}
           <li class="text-xs text-amber-700">
-            <code class="rounded bg-amber-100 px-1 py-0.5 font-mono">{token}</code>
-            — empty for {missingCount} of {leads.length} lead{leads.length === 1 ? "" : "s"}
+            <code class="rounded bg-amber-100 px-1 py-0.5 font-mono"
+              >{token}</code
+            >
+            — empty for {missingCount} of {leads.length} lead{leads.length ===
+            1
+              ? ""
+              : "s"}
           </li>
         {/each}
       </ul>

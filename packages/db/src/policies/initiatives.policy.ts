@@ -6,12 +6,21 @@ type OrgScopedTable = {
 
 export const initiativePolicies = {
   initiative: (table: OrgScopedTable) => [
-    createOrganizationPolicy("initiative_org_policy", table.organizationId),
+    createOrganizationPolicy(
+      "initiative_org_policy",
+      table.organizationId
+    ),
   ],
   initiativeLead: (table: OrgScopedTable) => [
-    createOrganizationPolicy("initiativeLead_org_policy", table.organizationId),
+    createOrganizationPolicy(
+      "initiativeLead_org_policy",
+      table.organizationId
+    ),
   ],
   initiativeConversation: (table: OrgScopedTable) => [
-    createOrganizationPolicy("initiativeConversation_org_policy", table.organizationId),
+    createOrganizationPolicy(
+      "initiativeConversation_org_policy",
+      table.organizationId
+    ),
   ],
 };

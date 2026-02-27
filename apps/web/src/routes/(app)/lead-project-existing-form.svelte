@@ -153,7 +153,7 @@
       </label>
       <select
         id="project"
-        class="border-neutral-200 focus-visible:border-primary-500 focus-visible:ring-primary-500/20 w-full rounded-xl border bg-white px-3 py-2 text-sm text-neutral-900 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        class="focus-visible:border-primary-500 focus-visible:ring-primary-500/20 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         value={selectedProjectId}
         onchange={handleExistingProjectChange}
         disabled={projects.length === 0}

@@ -13,6 +13,12 @@
   }: LabelProps = $props();
 </script>
 
-<label class={["font-mono text-xs font-bold uppercase tracking-wider text-neutral-800", className]} {...restProps}>
+<label
+  class={[
+    "font-mono text-xs font-bold tracking-wider text-neutral-800 uppercase",
+    className,
+  ]}
+  {...restProps}
+>
   {@render children()}
 </label>
