@@ -1,0 +1,36 @@
+.git
+.gitignore
+
+# Dependencies (reinstalled in container)
+node_modules
+
+# Build outputs (rebuilt in container)
+.svelte-kit
+build
+dist
+.turbo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Dev tooling
+.claude
+.agents
+.windsurf
+docs
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Misc
+LICENSE
