@@ -65,19 +65,64 @@ The app is available at [http://localhost:5173](http://localhost:5173).
 
 ### Environment Variables
 
+#### Core (required)
+
+| Variable               | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string             |
+| `BETTER_AUTH_SECRET`   | Secret key for session encryption        |
+| `BETTER_AUTH_BASE_URL` | Public URL of the app                    |
+
+#### API Keys
+
 | Variable                | Required | Description                              |
 | ----------------------- | -------- | ---------------------------------------- |
-| `DATABASE_URL`          | Yes      | PostgreSQL connection string             |
-| `BETTER_AUTH_SECRET`    | Yes      | Secret key for session encryption        |
-| `BETTER_AUTH_BASE_URL`  | Yes      | Public URL of the app                    |
 | `GOOGLE_PLACES_API_KEY` | Yes      | Google Places API key for lead discovery |
-| `BRAVE_API_KEY`         | No       | Brave Search API key                     |
+| `BRAVE_API_KEY`         | No       | Brave Search API key for enrichment      |
 | `OPENROUTER_API_KEY`    | No       | OpenRouter API key for AI-powered search |
-| `SMTP_HOST`             | No       | SMTP server host for sending emails      |
-| `SMTP_PORT`             | No       | SMTP server port                         |
-| `SMTP_USER`             | No       | SMTP username                            |
-| `SMTP_PASS`             | No       | SMTP password                            |
-| `EMAIL_FROM`            | No       | Sender email address                     |
+| `OPENROUTER_MODEL`      | No       | OpenRouter model name (default: `openai/gpt-4o-mini`) |
+
+#### Email (SMTP)
+
+| Variable    | Required | Description                                  |
+| ----------- | -------- | -------------------------------------------- |
+| `SMTP_HOST` | No       | SMTP server host                             |
+| `SMTP_PORT` | No       | SMTP server port (default: `1025`)           |
+| `SMTP_USER` | No       | SMTP username                                |
+| `SMTP_PASS` | No       | SMTP password                                |
+| `EMAIL_FROM`| No       | Sender email address (default: `noreply@example.com`) |
+
+#### Logging (Dynatrace)
+
+Logs always go to the console. To also ship them to Dynatrace Log Ingestion API v2, provide the URL and token:
+
+| Variable                   | Required | Description                                              |
+| -------------------------- | -------- | -------------------------------------------------------- |
+| `DYNATRACE_LOG_INGEST_URL` | No       | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`)   |
+| `DYNATRACE_API_TOKEN`      | No       | Dynatrace API token with `logs.ingest` scope             |
+| `DYNATRACE_LOGGING`        | No       | Set to `false` to disable Dynatrace even when configured |
+
+When using Docker, the Dynatrace URL and token are provided as **build args**:
+
+```bash
+docker build \
+  --build-arg DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest \
+  --build-arg DYNATRACE_API_TOKEN=dt0c01.XXXX \
+  -t leader .
+```
+
+#### Bootstrap
+
+On first startup the app automatically creates an initial admin user and organization. These env vars customize that behavior:
+
+| Variable                       | Default            | Description                    |
+| ------------------------------ | ------------------ | ------------------------------ |
+| `BOOTSTRAP_USER_NAME`          | `Admin`            | Display name of the first user |
+| `BOOTSTRAP_USER_EMAIL`         | `admin@leader.local` | Email / login of the first user |
+| `BOOTSTRAP_ORGANIZATION_NAME`  | `Leader`           | Name of the default organization |
+| `BOOTSTRAP_ORGANIZATION_SLUG`  | `leader`           | URL slug of the default organization |
+
+A random password is generated and printed to the console on first run. After the initial user exists, subsequent restarts skip creation.
 
 See [`.env.example`](.env.example) for defaults.
 
