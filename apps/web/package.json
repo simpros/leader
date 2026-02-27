@@ -16,6 +16,7 @@
   "devDependencies": {
     "@leader/auth": "workspace:*",
     "@leader/db": "workspace:*",
+    "@leader/logging": "workspace:*",
     "@leader/eslint-config": "workspace:*",
     "@leader/tailwind-config": "workspace:*",
     "@leader/ui": "workspace:*",

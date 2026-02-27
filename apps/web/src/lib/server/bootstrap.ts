@@ -1,7 +1,10 @@
 import { APIError } from "better-auth";
+import { getLogger } from "@leader/logging";
 import { auth } from "@leader/auth";
 import { and, db, eq, schema } from "@leader/db";
 import { env } from "$env/dynamic/private";
+
+const logger = getLogger(["leader", "web", "bootstrap"]);
 
 const BOOTSTRAP_USER_NAME = env.BOOTSTRAP_USER_NAME ?? "Admin";
 const BOOTSTRAP_USER_EMAIL =
@@ -53,6 +56,13 @@ export const ensureInitialUserWithOrganization = async () => {
         `[bootstrap] Initial user created for organization '${BOOTSTRAP_ORGANIZATION_SLUG}': ${BOOTSTRAP_USER_EMAIL}`
       );
       console.info(`[bootstrap] Initial user password: ${password}`);
+      logger.info(
+        "Initial user created for organization '{slug}': {email}",
+        {
+          slug: BOOTSTRAP_ORGANIZATION_SLUG,
+          email: BOOTSTRAP_USER_EMAIL,
+        }
+      );
     } catch (error) {
       if (
         !(

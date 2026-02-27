@@ -12,6 +12,8 @@ GOOGLE_PLACES_API_KEY=replace-me
 OPENROUTER_API_KEY=optional
 OPENROUTER_MODEL=openai/gpt-4o-mini
 BRAVE_API_KEY=optional
+DYNATRACE_LOG_INGEST_URL=optional
+DYNATRACE_API_TOKEN=optional
 ```
 
 ## Database
