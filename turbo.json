@@ -16,7 +16,8 @@
         "SMTP_USER",
         "SMTP_PASSWORD",
         "DYNATRACE_LOG_INGEST_URL",
-        "DYNATRACE_API_TOKEN"
+        "DYNATRACE_API_TOKEN",
+        "DYNATRACE_LOGGING"
       ]
     },
     "build": {

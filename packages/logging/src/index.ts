@@ -15,10 +15,11 @@ export async function configureLogging(): Promise<void> {
   };
   const sinkNames: string[] = ["console"];
 
+  const dtEnabled = process.env.DYNATRACE_LOGGING !== "false";
   const dtUrl = process.env.DYNATRACE_LOG_INGEST_URL;
   const dtToken = process.env.DYNATRACE_API_TOKEN;
 
-  if (dtUrl && dtToken) {
+  if (dtEnabled && dtUrl && dtToken) {
     const dt = createDynatraceSink({ url: dtUrl, apiToken: dtToken });
     sinks.dynatrace = dt.sink;
     sinkNames.push("dynatrace");

@@ -35,6 +35,11 @@ USER app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+ARG DYNATRACE_LOG_INGEST_URL
+ARG DYNATRACE_API_TOKEN
+ENV DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}
+ENV DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}
+
 COPY --from=builder --chown=app:app /app/apps/web/build ./
 # Migrations are resolved at runtime from server hooks via ../drizzle
 COPY --from=builder --chown=app:app /app/packages/db/drizzle ./server/drizzle
