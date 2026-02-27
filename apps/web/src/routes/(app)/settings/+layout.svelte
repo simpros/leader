@@ -9,9 +9,14 @@
   );
 
   const navLinks = $derived([
-    { href: "/settings/profile", label: "Profile" },
+    { href: "/settings/profile" as const, label: "Profile" },
     ...(isOrgAdmin
-      ? [{ href: "/settings/organisation", label: "Organisation" }]
+      ? [
+          {
+            href: "/settings/organisation" as const,
+            label: "Organisation",
+          },
+        ]
       : []),
   ]);
 </script>
@@ -19,12 +24,12 @@
 <div class="leader-page">
   <div class="mb-8">
     <p
-      class="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-primary-700"
+      class="text-primary-700 font-mono text-[10px] font-bold tracking-[0.3em] uppercase"
     >
       Account
     </p>
     <h1
-      class="text-2xl font-bold uppercase tracking-tight text-neutral-950 sm:text-3xl"
+      class="text-2xl font-bold tracking-tight text-neutral-950 uppercase sm:text-3xl"
     >
       Settings
     </h1>
@@ -37,11 +42,11 @@
     >
       {#each navLinks as link (link.href)}
         <a
-          href={resolve(link.href as any)}
+          href={resolve(link.href)}
           class={[
-            "border-2 px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-snappy",
+            "transition-snappy border-2 px-4 py-2 font-mono text-xs font-bold tracking-wider uppercase",
             page.url.pathname.startsWith(link.href)
-              ? "border-neutral-800 bg-primary-500 text-white"
+              ? "bg-primary-500 border-neutral-800 text-white"
               : "border-transparent text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950",
           ]}
         >
