@@ -1,0 +1,23 @@
+{
+  "name": "@leader/auth",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/auth.ts",
+    "./client": "./src/auth-client.ts"
+  },
+  "scripts": {
+    "auth:generate": "bunx @better-auth/cli@latest generate",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@leader/db": "workspace:*",
+    "better-auth": "^1.4.18",
+    "nodemailer": "^8.0.1"
+  },
+  "devDependencies": {
+    "@leader/eslint-config": "workspace:*",
+    "@types/nodemailer": "^7.0.10"
+  }
+}

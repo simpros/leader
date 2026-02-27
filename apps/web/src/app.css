@@ -1,0 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+@import "tailwindcss";
+@source "../../../packages/ui/src";
+
+@theme {
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+
+  /* Bauhaus 95 — Warm Industrial */
+  --color-background: #f5ede0;
+  --color-foreground: #1a1008;
+  --color-surface: #faf4e8;
+  --color-surface-strong: #ede3d0;
+  --color-surface-hover: #f0e7d6;
+  --color-surface-active: #e6dac4;
+
+  --color-brand: #c4520a;
+  --color-brand-strong: #a3430a;
+
+  --color-accent: #bf8034;
+  --color-highlight: #f2e6c8;
+
+  --color-border: #2a1f0e;
+  --color-muted: #6b5b45;
+
+  /* Primary — Terracotta */
+  --color-primary-50: #fdf0e6;
+  --color-primary-100: #fadbc4;
+  --color-primary-200: #f3b88e;
+  --color-primary-300: #e8914f;
+  --color-primary-400: #d97520;
+  --color-primary-500: #c4520a;
+  --color-primary-600: #a3430a;
+  --color-primary-700: #7f350a;
+  --color-primary-800: #5e2a0d;
+  --color-primary-900: #401d0b;
+  --color-primary-950: #240f06;
+
+  /* Neutral — Raw Umber */
+  --color-neutral-50: #f7f2ea;
+  --color-neutral-100: #ede5d5;
+  --color-neutral-200: #d9ccb3;
+  --color-neutral-300: #b8a585;
+  --color-neutral-400: #8c7a5c;
+  --color-neutral-500: #6b5b45;
+  --color-neutral-600: #544838;
+  --color-neutral-700: #3d342a;
+  --color-neutral-800: #2a1f0e;
+  --color-neutral-900: #1f1709;
+  --color-neutral-950: #1a1008;
+
+  /* Secondary — Ochre / Mustard */
+  --color-secondary-50: #fdf7ea;
+  --color-secondary-100: #f9ecd0;
+  --color-secondary-200: #f0d69a;
+  --color-secondary-300: #e0b85e;
+  --color-secondary-400: #bf8034;
+  --color-secondary-500: #a06a20;
+  --color-secondary-600: #825618;
+  --color-secondary-700: #644214;
+  --color-secondary-800: #4a3211;
+  --color-secondary-900: #35240e;
+  --color-secondary-950: #1e1408;
+
+  /* Destructive — Signal Red */
+  --color-destructive-50: #fef0ee;
+  --color-destructive-100: #fedcd8;
+  --color-destructive-200: #fcb0a8;
+  --color-destructive-300: #f87a6c;
+  --color-destructive-400: #e84d3a;
+  --color-destructive-500: #c43322;
+  --color-destructive-600: #a0291c;
+  --color-destructive-700: #7c2018;
+  --color-destructive-800: #5e1a14;
+  --color-destructive-900: #441411;
+  --color-destructive-950: #2a0b09;
+
+  /* Gold accent — Brass */
+  --color-gold-50: #faf5e6;
+  --color-gold-100: #f2e8c4;
+  --color-gold-200: #e4d08e;
+  --color-gold-300: #cfb258;
+  --color-gold-400: #b8972e;
+  --color-gold-500: #967a1e;
+  --color-gold-600: #746018;
+  --color-gold-700: #554714;
+  --color-gold-800: #3c3210;
+  --color-gold-900: #28220c;
+  --color-gold-950: #181408;
+
+  /* Snappy, mechanical transitions */
+  --duration-fast: 80ms;
+  --duration-base: 150ms;
+  --duration-slow: 250ms;
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+:root {
+  color-scheme: light;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-primary-300);
+  color: var(--color-foreground);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+}
+
+@layer utilities {
+  .leader-shell {
+    @apply relative flex min-h-screen flex-col;
+  }
+
+  .leader-card-soft {
+    @apply border-2 border-neutral-800 bg-surface;
+  }
+
+  .leader-page {
+    @apply mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10;
+  }
+
+  .leader-stack {
+    @apply flex flex-col gap-6 sm:gap-7;
+  }
+
+  .leader-surface {
+    @apply border-2 border-neutral-800 bg-surface;
+  }
+
+  .leader-headline {
+    @apply text-4xl leading-none font-bold tracking-tight text-neutral-950 uppercase sm:text-5xl md:text-6xl;
+  }
+
+  .leader-copy {
+    @apply text-sm leading-relaxed text-neutral-600 sm:text-base;
+  }
+
+  .transition-snappy {
+    @apply transition-all duration-100 ease-out;
+  }
+}

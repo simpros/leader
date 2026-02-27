@@ -1,0 +1,10 @@
+node_modules/
+.turbo/
+.svelte-kit/
+build/
+dist/
+.env
+.env.*
+**/*.db
+**/*.sqlite
+**/*.sqlite3

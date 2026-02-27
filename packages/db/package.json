@@ -1,0 +1,27 @@
+{
+  "name": "@leader/db",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "nanoid": "^5.1.6",
+    "valibot": "^1.1.0"
+  },
+  "devDependencies": {
+    "@leader/eslint-config": "workspace:*",
+    "@types/bun": "1.3.8",
+    "drizzle-orm": "1.0.0-beta.12-a5629fb",
+    "drizzle-kit": "1.0.0-beta.12-a5629fb",
+    "drizzle-valibot": "^0.4.2"
+  }
+}

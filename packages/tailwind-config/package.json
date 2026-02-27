@@ -1,0 +1,26 @@
+{
+  "name": "@leader/tailwind-config",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./tailwind.config.ts",
+  "types": "./tailwind.config.ts",
+  "exports": {
+    ".": {
+      "types": "./tailwind.config.ts",
+      "default": "./tailwind.config.ts"
+    }
+  },
+  "files": [
+    "tailwind.config.ts"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@leader/eslint-config": "workspace:*"
+  }
+}
