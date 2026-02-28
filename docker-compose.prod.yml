@@ -41,6 +41,7 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       EMAIL_FROM: ${EMAIL_FROM:-noreply@example.com}
+      LEADER_TELEMETRY: ${LEADER_TELEMETRY:-true}
     depends_on:
       db:
         condition: service_healthy

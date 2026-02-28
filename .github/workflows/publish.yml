@@ -70,6 +70,10 @@ jobs:
         with:
           context: .
           file: apps/web/Dockerfile
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
+            DYNATRACE_LOG_INGEST_URL=${{ secrets.DYNATRACE_LOG_INGEST_URL }}
+            DYNATRACE_API_TOKEN=${{ secrets.DYNATRACE_API_TOKEN }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

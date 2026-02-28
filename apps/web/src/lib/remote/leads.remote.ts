@@ -20,6 +20,7 @@ import {
   updateLeadCoreInputSchema,
   upsertLeadCustomFieldValueInputSchema,
 } from "$lib/schemas";
+import { addRequestLogContext } from "$lib/server/request-logging";
 import { enrichEmail } from "$lib/server/leads/email";
 import {
   googlePlaceDetails,
@@ -41,6 +42,7 @@ type LeadFormResponse = LeadResponse & { message?: string };
  * based on configured environment variables.
  */
 export const getDiscoveryCapabilities = query(async () => {
+  addRequestLogContext({ action: "getDiscoveryCapabilities" });
   return {
     openRouterAvailable: !!OPENROUTER_API_KEY,
   };
@@ -106,6 +108,7 @@ export const discoverLeads = form(
     location,
     maxResults,
   }): Promise<LeadFormResponse> => {
+    addRequestLogContext({ action: "discoverLeads", location, max_results: maxResults });
     let source: LeadResponse["source"] = "google-places";
     let message: string | undefined;
 
@@ -233,6 +236,7 @@ export const discoverLeads = form(
  * @returns Array of leads with project associations
  */
 export const getLeads = query(async () => {
+  addRequestLogContext({ action: "getLeads" });
   const { locals } = getRequestEvent();
   const organizationId = locals.session?.activeOrganizationId;
 
@@ -274,6 +278,7 @@ export const getLeads = query(async () => {
 export const createManualLead = form(
   createManualLeadInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "createManualLead", project_id: input.projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -333,6 +338,7 @@ export const createManualLead = form(
  * @throws 404 if lead is not found or user doesn't have access
  */
 export const getLeadData = query(leadIdSchema, async (leadId) => {
+  addRequestLogContext({ action: "getLeadData", lead_id: leadId });
   const { locals } = getRequestEvent();
   const userId = locals.user?.id;
   const organizationId = locals.session?.activeOrganizationId;
@@ -450,6 +456,7 @@ export const getLeadData = query(leadIdSchema, async (leadId) => {
 export const updateLeadCore = form(
   updateLeadCoreInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "updateLeadCore", lead_id: input.leadId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -488,6 +495,7 @@ export const updateLeadCore = form(
 export const createProjectCustomField = form(
   createProjectCustomFieldInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "createProjectCustomField", project_id: input.projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -578,6 +586,7 @@ export const createProjectCustomField = form(
 export const upsertLeadCustomFieldValue = form(
   upsertLeadCustomFieldValueInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "upsertLeadCustomFieldValue", lead_id: input.leadId, field_id: input.projectCustomFieldId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -654,6 +663,7 @@ export const upsertLeadCustomFieldValue = form(
  * @throws 404 if lead is not found or user doesn't have access
  */
 export const deleteLead = form(deleteLeadInputSchema, async (input) => {
+  addRequestLogContext({ action: "deleteLead", lead_id: input.leadId });
   const { locals } = getRequestEvent();
   const userId = locals.user?.id;
   const organizationId = locals.session?.activeOrganizationId;

@@ -65,19 +65,57 @@ The app is available at [http://localhost:5173](http://localhost:5173).
 
 ### Environment Variables
 
+#### Core (required)
+
+| Variable               | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string             |
+| `BETTER_AUTH_SECRET`   | Secret key for session encryption        |
+| `BETTER_AUTH_BASE_URL` | Public URL of the app                    |
+
+#### API Keys
+
 | Variable                | Required | Description                              |
 | ----------------------- | -------- | ---------------------------------------- |
-| `DATABASE_URL`          | Yes      | PostgreSQL connection string             |
-| `BETTER_AUTH_SECRET`    | Yes      | Secret key for session encryption        |
-| `BETTER_AUTH_BASE_URL`  | Yes      | Public URL of the app                    |
 | `GOOGLE_PLACES_API_KEY` | Yes      | Google Places API key for lead discovery |
-| `BRAVE_API_KEY`         | No       | Brave Search API key                     |
+| `BRAVE_API_KEY`         | No       | Brave Search API key for enrichment      |
 | `OPENROUTER_API_KEY`    | No       | OpenRouter API key for AI-powered search |
-| `SMTP_HOST`             | No       | SMTP server host for sending emails      |
-| `SMTP_PORT`             | No       | SMTP server port                         |
-| `SMTP_USER`             | No       | SMTP username                            |
-| `SMTP_PASS`             | No       | SMTP password                            |
-| `EMAIL_FROM`            | No       | Sender email address                     |
+| `OPENROUTER_MODEL`      | No       | OpenRouter model name (default: `openai/gpt-4o-mini`) |
+
+#### Email (SMTP)
+
+| Variable    | Required | Description                                  |
+| ----------- | -------- | -------------------------------------------- |
+| `SMTP_HOST` | No       | SMTP server host                             |
+| `SMTP_PORT` | No       | SMTP server port (default: `1025`)           |
+| `SMTP_USER` | No       | SMTP username                                |
+| `SMTP_PASS` | No       | SMTP password                                |
+| `EMAIL_FROM`| No       | Sender email address (default: `noreply@example.com`) |
+
+#### Telemetry
+
+The official Docker image ships with anonymous telemetry that helps the maintainers identify bugs and prioritize improvements. **No personal data is collected** — only structured request logs (method, path, status code, duration) are sent to the maintainers' log aggregator.
+
+You can opt out at any time by setting a single environment variable:
+
+| Variable           | Default | Description                                      |
+| ------------------ | ------- | ------------------------------------------------ |
+| `LEADER_TELEMETRY` | _(on)_  | Set to `false` to disable telemetry completely   |
+
+When telemetry is off, logs are still written to the console — only the remote reporting is disabled.
+
+#### Bootstrap
+
+On first startup the app automatically creates an initial admin user and organization. These env vars customize that behavior:
+
+| Variable                       | Default            | Description                    |
+| ------------------------------ | ------------------ | ------------------------------ |
+| `BOOTSTRAP_USER_NAME`          | `Admin`            | Display name of the first user |
+| `BOOTSTRAP_USER_EMAIL`         | `admin@leader.local` | Email / login of the first user |
+| `BOOTSTRAP_ORGANIZATION_NAME`  | `Leader`           | Name of the default organization |
+| `BOOTSTRAP_ORGANIZATION_SLUG`  | `leader`           | URL slug of the default organization |
+
+A random password is generated and printed to the console on first run. After the initial user exists, subsequent restarts skip creation.
 
 See [`.env.example`](.env.example) for defaults.
 
@@ -175,6 +213,26 @@ Contributions are welcome! Please open an issue or pull request.
 2. Create a feature branch (`git checkout -b feature/my-feature`)
 3. Commit your changes
 4. Push to your fork and open a pull request
+
+### Maintainer: Telemetry Build Configuration
+
+The official Docker image embeds Dynatrace credentials at **build time** so end users don't need to configure them. These are stored as GitHub Actions secrets and passed as Docker build args during CI:
+
+| Build Arg                    | GitHub Secret                | Description                                           |
+| ---------------------------- | ---------------------------- | ----------------------------------------------------- |
+| `DYNATRACE_LOG_INGEST_URL`  | `DYNATRACE_LOG_INGEST_URL`  | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`) |
+| `DYNATRACE_API_TOKEN`       | `DYNATRACE_API_TOKEN`       | Dynatrace API token with `logs.ingest` scope          |
+
+To build locally with telemetry:
+
+```bash
+docker build \
+  --build-arg DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest \
+  --build-arg DYNATRACE_API_TOKEN=dt0c01.XXXX \
+  -t leader apps/web
+```
+
+If neither arg is provided, the image runs with console-only logging (telemetry becomes a no-op regardless of `LEADER_TELEMETRY`).
 
 ## License
 

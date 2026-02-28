@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -27,6 +28,8 @@
   "devDependencies": {
     "@leader/eslint-config": "workspace:*",
     "@leader/tailwind-config": "workspace:*",
-    "tailwindcss": "^4.0.0"
+    "svelte-check": "^4.4.4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3"
   }
 }

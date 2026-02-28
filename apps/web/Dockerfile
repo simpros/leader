@@ -1,3 +1,5 @@
+ARG COMMIT_SHA=unknown
+
 FROM oven/bun:1.3.9-alpine AS base
 
 WORKDIR /app
@@ -28,12 +30,20 @@ RUN bun run build --filter=@leader/web
 # ---- Production runner ----
 FROM base AS runner
 
+ARG COMMIT_SHA
+ARG DYNATRACE_LOG_INGEST_URL
+ARG DYNATRACE_API_TOKEN
+RUN printf '%s\n%s\n' \
+    "DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}" \
+    "DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}" > .env.telemetry
+
 RUN addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 -G app app
 USER app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV COMMIT_SHA=${COMMIT_SHA}
 
 COPY --from=builder --chown=app:app /app/apps/web/build ./
 # Migrations are resolved at runtime from server hooks via ../drizzle
@@ -44,4 +54,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-CMD ["bun", "run", "index.js"]
+CMD ["sh", "-c", "set -a && . ./.env.telemetry && set +a && exec bun run index.js"]

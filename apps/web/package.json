@@ -1,7 +1,7 @@
 {
   "name": "@leader/web",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@leader/auth": "workspace:*",
     "@leader/db": "workspace:*",
+    "@leader/logging": "workspace:*",
     "@leader/eslint-config": "workspace:*",
     "@leader/tailwind-config": "workspace:*",
     "@leader/ui": "workspace:*",

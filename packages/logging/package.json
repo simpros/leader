@@ -1,0 +1,21 @@
+{
+  "name": "@leader/logging",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@logtape/logtape": "^2.0.0"
+  },
+  "devDependencies": {
+    "@leader/eslint-config": "workspace:*",
+    "@types/node": "^25.3.2",
+    "typescript": "^5.9.3"
+  }
+}

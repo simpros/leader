@@ -1,4 +1,7 @@
+import { getLogger } from "@logtape/logtape";
 import nodemailer from "nodemailer";
+
+const logger = getLogger(["leader", "auth", "email"]);
 
 const smtpHost = process.env.SMTP_HOST || "localhost";
 const smtpPort = parseInt(process.env.SMTP_PORT || "1025", 10); // default to mailhog/mailpit port for local dev
@@ -39,9 +42,14 @@ export const sendEmail = async ({
       text: text || html.replace(/<[^>]*>?/gm, ""), // simple fallback text
     });
     console.log("Message sent: %s", info.messageId);
+    logger.info("Email sent", { messageId: info.messageId, to, subject });
     return info;
   } catch (error) {
-    console.error("Error sending email:", error);
+    logger.error("Failed to send email", {
+      to,
+      subject,
+      error: error instanceof Error ? error.message : String(error),
+    });
     throw error;
   }
 };

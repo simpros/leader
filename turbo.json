@@ -10,16 +10,26 @@
         "BETTER_AUTH_BASE_URL",
         "GOOGLE_PLACES_API_KEY",
         "OPENROUTER_API_KEY",
+        "OPENROUTER_MODEL",
         "BRAVE_API_KEY",
         "SMTP_HOST",
         "SMTP_PORT",
         "SMTP_USER",
-        "SMTP_PASSWORD"
+        "SMTP_PASS",
+        "EMAIL_FROM",
+        "LEADER_TELEMETRY",
+        "BOOTSTRAP_USER_NAME",
+        "BOOTSTRAP_USER_EMAIL",
+        "BOOTSTRAP_ORGANIZATION_NAME",
+        "BOOTSTRAP_ORGANIZATION_SLUG"
       ]
     },
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".svelte-kit/**", "build/**", "dist/**"]
+    },
+    "check": {
+      "dependsOn": ["^build"]
     },
     "lint": {
       "dependsOn": ["^lint"]

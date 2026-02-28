@@ -25,6 +25,7 @@ import {
   customFieldToken,
   resolveTemplate,
 } from "$lib/components/template-variables";
+import { addRequestLogContext } from "$lib/server/request-logging";
 
 const OPENROUTER_API_KEY = env.OPENROUTER_API_KEY ?? "";
 const OPENROUTER_MODEL = env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
@@ -52,6 +53,7 @@ const ensureProjectAccess = async (
 };
 
 export const getInitiativeCapabilities = query(async () => {
+  addRequestLogContext({ action: "getInitiativeCapabilities" });
   return {
     aiGenerationAvailable: !!OPENROUTER_API_KEY,
   };
@@ -60,6 +62,7 @@ export const getInitiativeCapabilities = query(async () => {
 export const generateInitiativeEmail = command(
   generateInitiativeEmailInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "generateInitiativeEmail", project_id: input.projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -177,6 +180,7 @@ export const generateInitiativeEmail = command(
 export const createInitiativeEmail = form(
   createInitiativeEmailInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "createInitiativeEmail", project_id: input.projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -220,6 +224,7 @@ export const createInitiativeEmail = form(
 export const sendInitiativeTestEmail = form(
   sendInitiativeTestEmailInputSchema,
   async (input) => {
+    addRequestLogContext({ action: "sendInitiativeTestEmail", project_id: input.projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const userEmail = locals.user?.email?.trim();
@@ -280,6 +285,7 @@ export const sendInitiativeTestEmail = form(
 export const sendInitiative = form(
   v.object({ initiativeId: initiativeIdSchema }),
   async (input) => {
+    addRequestLogContext({ action: "sendInitiative", initiative_id: input.initiativeId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -428,6 +434,7 @@ export const sendInitiative = form(
 export const retryInitiativeLead = form(
   v.object({ initiativeLeadId: initiativeLeadIdSchema }),
   async (input) => {
+    addRequestLogContext({ action: "retryInitiativeLead", initiative_lead_id: input.initiativeLeadId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -504,7 +511,9 @@ export const retryInitiativeLead = form(
       try {
         await sendEmail(lead.email, resolvedSubject, resolvedHtmlBody);
       } catch (err) {
-        console.log(err);
+        addRequestLogContext({
+          email_send_error: err instanceof Error ? err.message : String(err),
+        });
 
         throw error(500, "Failed to resend email");
       }
@@ -538,6 +547,7 @@ export const retryInitiativeLead = form(
 export const getProjectInitiatives = query(
   projectIdSchema,
   async (projectId) => {
+    addRequestLogContext({ action: "getProjectInitiatives", project_id: projectId });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
