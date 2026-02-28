@@ -31,11 +31,11 @@ RUN bun run build --filter=@leader/web
 FROM base AS runner
 
 ARG COMMIT_SHA
-ARG DYNATRACE_LOG_INGEST_URL
-ARG DYNATRACE_API_TOKEN
-RUN printf '%s\n%s\n' \
-    "DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}" \
-    "DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}" > .env.telemetry
+RUN --mount=type=secret,id=DYNATRACE_LOG_INGEST_URL \
+    --mount=type=secret,id=DYNATRACE_API_TOKEN \
+    printf '%s\n%s\n' \
+    "DYNATRACE_LOG_INGEST_URL=$(cat /run/secrets/DYNATRACE_LOG_INGEST_URL)" \
+    "DYNATRACE_API_TOKEN=$(cat /run/secrets/DYNATRACE_API_TOKEN)" > .env.telemetry
 
 RUN addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 -G app app
