@@ -31,6 +31,11 @@ RUN bun run build --filter=@leader/web
 FROM base AS runner
 
 ARG COMMIT_SHA
+ARG DYNATRACE_LOG_INGEST_URL
+ARG DYNATRACE_API_TOKEN
+RUN printf '%s\n%s\n' \
+    "DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}" \
+    "DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}" > .env.telemetry
 
 RUN addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 -G app app
@@ -39,12 +44,6 @@ USER app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV COMMIT_SHA=${COMMIT_SHA}
-
-ARG DYNATRACE_LOG_INGEST_URL
-ARG DYNATRACE_API_TOKEN
-RUN printf '%s\n%s\n' \
-    "DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}" \
-    "DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}" > .env.telemetry
 
 COPY --from=builder --chown=app:app /app/apps/web/build ./
 # Migrations are resolved at runtime from server hooks via ../drizzle
