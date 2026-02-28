@@ -44,7 +44,7 @@ function mapRecord(
     content: renderMessage(record.message),
     "log.source": record.category.join("."),
     severity: SEVERITY_MAP[record.level] ?? "INFO",
-    timestamp: record.timestamp.toISOString(),
+    timestamp: new Date(record.timestamp).toISOString(),
   };
 
   for (const [key, value] of Object.entries(record.properties)) {

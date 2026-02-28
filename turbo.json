@@ -28,6 +28,9 @@
       "dependsOn": ["^build"],
       "outputs": [".svelte-kit/**", "build/**", "dist/**"]
     },
+    "check": {
+      "dependsOn": ["^build"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

@@ -9,6 +9,7 @@
   },
   "scripts": {
     "auth:generate": "bunx @better-auth/cli@latest generate",
+    "check": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@leader/eslint-config": "workspace:*",
-    "@types/nodemailer": "^7.0.10"
+    "@types/nodemailer": "^7.0.10",
+    "typescript": "^5.9.3"
   }
 }
