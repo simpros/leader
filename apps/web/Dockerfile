@@ -42,8 +42,9 @@ ENV COMMIT_SHA=${COMMIT_SHA}
 
 ARG DYNATRACE_LOG_INGEST_URL
 ARG DYNATRACE_API_TOKEN
-ENV DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}
-ENV DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}
+RUN printf '%s\n%s\n' \
+    "DYNATRACE_LOG_INGEST_URL=${DYNATRACE_LOG_INGEST_URL}" \
+    "DYNATRACE_API_TOKEN=${DYNATRACE_API_TOKEN}" > .env.telemetry
 
 COPY --from=builder --chown=app:app /app/apps/web/build ./
 # Migrations are resolved at runtime from server hooks via ../drizzle
@@ -54,4 +55,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-CMD ["bun", "run", "index.js"]
+CMD ["sh", "-c", "set -a && . ./.env.telemetry && set +a && exec bun run index.js"]

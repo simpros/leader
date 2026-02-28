@@ -92,24 +92,17 @@ The app is available at [http://localhost:5173](http://localhost:5173).
 | `SMTP_PASS` | No       | SMTP password                                |
 | `EMAIL_FROM`| No       | Sender email address (default: `noreply@example.com`) |
 
-#### Logging (Dynatrace)
+#### Telemetry
 
-Logs always go to the console. To also ship them to Dynatrace Log Ingestion API v2, provide the URL and token:
+The official Docker image ships with anonymous telemetry that helps the maintainers identify bugs and prioritize improvements. **No personal data is collected** — only structured request logs (method, path, status code, duration) are sent to the maintainers' log aggregator.
 
-| Variable                   | Required | Description                                              |
-| -------------------------- | -------- | -------------------------------------------------------- |
-| `DYNATRACE_LOG_INGEST_URL` | No       | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`)   |
-| `DYNATRACE_API_TOKEN`      | No       | Dynatrace API token with `logs.ingest` scope             |
-| `DYNATRACE_LOGGING`        | No       | Set to `false` to disable Dynatrace even when configured |
+You can opt out at any time by setting a single environment variable:
 
-When using Docker, the Dynatrace URL and token are provided as **build args**:
+| Variable           | Default | Description                                      |
+| ------------------ | ------- | ------------------------------------------------ |
+| `LEADER_TELEMETRY` | _(on)_  | Set to `false` to disable telemetry completely   |
 
-```bash
-docker build \
-  --build-arg DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest \
-  --build-arg DYNATRACE_API_TOKEN=dt0c01.XXXX \
-  -t leader .
-```
+When telemetry is off, logs are still written to the console — only the remote reporting is disabled.
 
 #### Bootstrap
 
@@ -220,6 +213,26 @@ Contributions are welcome! Please open an issue or pull request.
 2. Create a feature branch (`git checkout -b feature/my-feature`)
 3. Commit your changes
 4. Push to your fork and open a pull request
+
+### Maintainer: Telemetry Build Configuration
+
+The official Docker image embeds Dynatrace credentials at **build time** so end users don't need to configure them. These are stored as GitHub Actions secrets and passed as Docker build args during CI:
+
+| Build Arg                    | GitHub Secret                | Description                                           |
+| ---------------------------- | ---------------------------- | ----------------------------------------------------- |
+| `DYNATRACE_LOG_INGEST_URL`  | `DYNATRACE_LOG_INGEST_URL`  | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`) |
+| `DYNATRACE_API_TOKEN`       | `DYNATRACE_API_TOKEN`       | Dynatrace API token with `logs.ingest` scope          |
+
+To build locally with telemetry:
+
+```bash
+docker build \
+  --build-arg DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest \
+  --build-arg DYNATRACE_API_TOKEN=dt0c01.XXXX \
+  -t leader apps/web
+```
+
+If neither arg is provided, the image runs with console-only logging (telemetry becomes a no-op regardless of `LEADER_TELEMETRY`).
 
 ## License
 
