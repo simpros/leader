@@ -47,8 +47,9 @@ const shouldAllowRequest = (event: Parameters<Handle>[0]["event"]) => {
   const isAuthApi = routeId?.startsWith(AUTH_API_ROUTE_PREFIX) ?? false;
   const isStaticRoute = routeId === null;
   const isLoginPage = routeId?.startsWith(LOGIN_ROUTE_ID) ?? false;
+  const isHealthCheck = routeId === "/health";
 
-  return isAuthApi || isLoginPage || isStaticRoute;
+  return isAuthApi || isLoginPage || isStaticRoute || isHealthCheck;
 };
 
 const handleUnauthenticated = (event: Parameters<Handle>[0]["event"]) => {

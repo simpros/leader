@@ -37,7 +37,8 @@ RUN --mount=type=secret,id=DYNATRACE_LOG_INGEST_URL \
     "DYNATRACE_LOG_INGEST_URL=$(cat /run/secrets/DYNATRACE_LOG_INGEST_URL)" \
     "DYNATRACE_API_TOKEN=$(cat /run/secrets/DYNATRACE_API_TOKEN)" > .env.telemetry
 
-RUN addgroup --system --gid 1001 app && \
+RUN apk add --no-cache curl && \
+    addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 -G app app
 USER app
 
@@ -49,9 +50,9 @@ COPY --from=builder --chown=app:app /app/apps/web/build ./
 # Migrations are resolved at runtime from server hooks via ../drizzle
 COPY --from=builder --chown=app:app /app/packages/db/drizzle ./server/drizzle
 
-EXPOSE 3000
+EXPOSE 3000/tcp
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD curl -f http://localhost:3000/health || exit 1
 
 CMD ["sh", "-c", "set -a && . ./.env.telemetry && set +a && exec bun run index.js"]
