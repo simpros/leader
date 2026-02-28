@@ -70,6 +70,8 @@ jobs:
         with:
           context: .
           file: apps/web/Dockerfile
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

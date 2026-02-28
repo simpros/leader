@@ -1,3 +1,5 @@
+ARG COMMIT_SHA=unknown
+
 FROM oven/bun:1.3.9-alpine AS base
 
 WORKDIR /app
@@ -28,12 +30,15 @@ RUN bun run build --filter=@leader/web
 # ---- Production runner ----
 FROM base AS runner
 
+ARG COMMIT_SHA
+
 RUN addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 -G app app
 USER app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV COMMIT_SHA=${COMMIT_SHA}
 
 ARG DYNATRACE_LOG_INGEST_URL
 ARG DYNATRACE_API_TOKEN

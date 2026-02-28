@@ -12,6 +12,7 @@ import { auth } from "@leader/auth";
 import { db, eq, runMigrations, schema, withRLS } from "@leader/db";
 import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
+import { randomUUIDv7 } from "bun";
 
 if (!building) {
   await configureLogging();
@@ -130,7 +131,7 @@ const permissionHandle: Handle = async ({ event, resolve }) => {
 const wideEventHandle: Handle = async ({ event, resolve }) => {
   const startTime = Date.now();
   const requestId =
-    event.request.headers.get("x-request-id") || crypto.randomUUID();
+    event.request.headers.get("x-request-id") || randomUUIDv7();
 
   const wideEvent: Record<string, unknown> = {
     request_id: requestId,
