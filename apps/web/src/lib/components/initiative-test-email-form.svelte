@@ -21,11 +21,10 @@
   let testSendMode = $state<"my-email" | "lead" | "custom">("my-email");
   let selectedTestLeadId = $state("");
   let customTestEmail = $state("");
-  let feedback = $state<{ type: "success" | "error"; text: string } | null>(
-    null
-  );
+  let errorMessage = $state("");
 
   const isSendingTestEmail = $derived(sendInitiativeTestEmail.pending > 0);
+  const testSendResult = $derived(sendInitiativeTestEmail.result);
   const selectableLeads = $derived(
     leads.filter((lead): lead is Lead & { id: string } => Boolean(lead.id))
   );
@@ -48,17 +47,13 @@
 
   const testInitiativeEmailForm = sendInitiativeTestEmail.enhance(
     async ({ submit }) => {
-      feedback = null;
+      errorMessage = "";
 
       try {
         await submit();
-        feedback = { type: "success", text: "Test email sent successfully." };
       } catch (error) {
         console.error(error);
-        feedback = {
-          type: "error",
-          text: "Unable to send test email. Try again.",
-        };
+        errorMessage = "Unable to send test email. Try again.";
       }
     }
   );
@@ -169,19 +164,19 @@
     </p>
   {/if}
 
-  {#if feedback?.type === "success"}
+  {#if testSendResult && !isSendingTestEmail && !errorMessage}
     <p
       class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
     >
-      {feedback.text}
+      Test email sent to {testSendResult.sentTo}.
     </p>
   {/if}
 
-  {#if feedback?.type === "error"}
+  {#if errorMessage}
     <p
       class="border-destructive-200 bg-destructive-50/90 text-destructive-700 rounded-xl border px-3 py-2 text-sm"
     >
-      {feedback.text}
+      {errorMessage}
     </p>
   {/if}
 

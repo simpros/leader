@@ -15,11 +15,11 @@
   let showPanel = $state(false);
   let prompt = $state("");
   let errorMessage = $state("");
-  let generating = $state(false);
+
+  const generating = $derived(generateInitiativeEmail.pending > 0);
 
   const handleGenerate = async () => {
     errorMessage = "";
-    generating = true;
 
     try {
       const result = await generateInitiativeEmail({
@@ -32,8 +32,6 @@
     } catch (err) {
       console.error(err);
       errorMessage = "Failed to generate email. Try again.";
-    } finally {
-      generating = false;
     }
   };
 </script>
