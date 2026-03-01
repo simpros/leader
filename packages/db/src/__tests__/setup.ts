@@ -1,14 +1,14 @@
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { SQL } from "bun";
+import { drizzle } from "drizzle-orm/bun-sql";
 import { sql } from "drizzle-orm";
-import postgres from "postgres";
 import { relations } from "../relations";
 
 type TestDatabase = ReturnType<typeof drizzle<typeof relations>>;
 
 let container: StartedPostgreSqlContainer | null = null;
 let testDb: TestDatabase | null = null;
-let sqlClient: ReturnType<typeof postgres> | null = null;
+let sqlClient: InstanceType<typeof SQL> | null = null;
 
 export async function setupTestDb(): Promise<{
   db: TestDatabase;
@@ -17,7 +17,7 @@ export async function setupTestDb(): Promise<{
 }> {
   container = await new PostgreSqlContainer("postgres:16-alpine").start();
   const connectionUri = container.getConnectionUri();
-  sqlClient = postgres(connectionUri);
+  sqlClient = new SQL(connectionUri);
   testDb = drizzle({ client: sqlClient, schema: relations });
 
   // Run migrations by executing the raw SQL files
@@ -57,7 +57,7 @@ export async function setupTestDb(): Promise<{
 
 export async function teardownTestDb(): Promise<void> {
   if (sqlClient) {
-    await sqlClient.end();
+    sqlClient.close();
     sqlClient = null;
   }
   if (container) {

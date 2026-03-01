@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { sql } from "drizzle-orm";
 import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { setupTestDb, teardownTestDb } from "./__tests__/setup";

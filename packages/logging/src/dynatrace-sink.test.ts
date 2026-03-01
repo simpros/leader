@@ -1,6 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, jest, spyOn, beforeEach, afterEach } from "bun:test";
 import type { LogRecord } from "@logtape/logtape";
 import { createDynatraceSink } from "./dynatrace-sink";
+
+/** Flush the microtask queue so chained promise callbacks settle. */
+async function flushPromises(count = 10) {
+  for (let i = 0; i < count; i++) {
+    await Promise.resolve();
+  }
+}
 
 function makeLogRecord(overrides: Partial<LogRecord> = {}): LogRecord {
   return {
@@ -16,12 +23,12 @@ function makeLogRecord(overrides: Partial<LogRecord> = {}): LogRecord {
 
 describe("createDynatraceSink", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
-    vi.restoreAllMocks();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it("creates a sink and dispose function", () => {
@@ -35,7 +42,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("buffers records without immediately flushing", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -54,7 +61,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("flushes when batch size is reached", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -70,7 +77,8 @@ describe("createDynatraceSink", () => {
     sink(makeLogRecord({ message: ["msg3"] }));
 
     // Batch size reached, flush should be scheduled
-    await vi.advanceTimersByTimeAsync(0);
+    jest.advanceTimersByTime(0);
+    await flushPromises();
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const body = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
@@ -81,7 +89,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("flushes on interval", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -94,7 +102,8 @@ describe("createDynatraceSink", () => {
 
     sink(makeLogRecord({ message: ["interval msg"] }));
 
-    await vi.advanceTimersByTimeAsync(5_000);
+    jest.advanceTimersByTime(5_000);
+    await flushPromises();
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
@@ -102,7 +111,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("sends correct headers", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -113,7 +122,8 @@ describe("createDynatraceSink", () => {
     });
 
     sink(makeLogRecord());
-    await vi.advanceTimersByTimeAsync(0);
+    jest.advanceTimersByTime(0);
+    await flushPromises();
 
     expect(fetchSpy).toHaveBeenCalledWith("https://dt.example.com/log", {
       method: "POST",
@@ -128,7 +138,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("maps log record fields correctly", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -147,7 +157,8 @@ describe("createDynatraceSink", () => {
       })
     );
 
-    await vi.advanceTimersByTimeAsync(0);
+    jest.advanceTimersByTime(0);
+    await flushPromises();
 
     const body = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
     expect(body[0]).toMatchObject({
@@ -163,8 +174,8 @@ describe("createDynatraceSink", () => {
   });
 
   it("handles fetch errors without throwing", async () => {
-    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network down"));
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    spyOn(globalThis, "fetch").mockRejectedValue(new Error("network down"));
+    const consoleSpy = spyOn(console, "warn").mockImplementation(() => {});
 
     const { sink, dispose } = createDynatraceSink({
       url: "https://example.com/log",
@@ -175,17 +186,18 @@ describe("createDynatraceSink", () => {
     sink(makeLogRecord());
 
     // Should not throw
-    await vi.advanceTimersByTimeAsync(0);
+    jest.advanceTimersByTime(0);
+    await flushPromises();
 
     await dispose();
     consoleSpy.mockRestore();
   });
 
   it("warns on non-ok response", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 500, statusText: "Internal Server Error" })
     );
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const consoleSpy = spyOn(console, "warn").mockImplementation(() => {});
 
     const { sink, dispose } = createDynatraceSink({
       url: "https://example.com/log",
@@ -194,7 +206,8 @@ describe("createDynatraceSink", () => {
     });
 
     sink(makeLogRecord());
-    await vi.advanceTimersByTimeAsync(0);
+    jest.advanceTimersByTime(0);
+    await flushPromises();
 
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("500")
@@ -205,7 +218,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("flushes remaining records on dispose", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -218,7 +231,7 @@ describe("createDynatraceSink", () => {
 
     sink(makeLogRecord({ message: ["flush on dispose"] }));
 
-    vi.useRealTimers();
+    jest.useRealTimers();
     await dispose();
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -227,7 +240,7 @@ describe("createDynatraceSink", () => {
   });
 
   it("maps severity levels correctly", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(null, { status: 200 })
     );
 
@@ -243,7 +256,8 @@ describe("createDynatraceSink", () => {
     for (let i = 0; i < levels.length; i++) {
       fetchSpy.mockClear();
       sink(makeLogRecord({ level: levels[i] }));
-      await vi.advanceTimersByTimeAsync(0);
+      jest.advanceTimersByTime(0);
+      await flushPromises();
 
       const body = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string);
       expect(body[0].severity).toBe(expected[i]);

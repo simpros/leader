@@ -9,7 +9,7 @@
   "scripts": {
     "check": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "bun test"
   },
   "dependencies": {
     "@logtape/logtape": "^2.0.0"
