@@ -10,7 +10,8 @@
   "scripts": {
     "auth:generate": "bunx @better-auth/cli@latest generate",
     "check": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "bun test"
   },
   "dependencies": {
     "@leader/db": "workspace:*",
