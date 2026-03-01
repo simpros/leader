@@ -12,15 +12,17 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "test": "bun test --conditions browser"
+    "test": "bun test --conditions browser",
+    "test:e2e": "vite build && cp -r ../../packages/db/drizzle build/server/drizzle && docker compose -f tests/docker-compose.e2e.yml down -v 2>/dev/null; docker compose -f tests/docker-compose.e2e.yml up -d --wait && playwright test; EXIT=$?; docker compose -f tests/docker-compose.e2e.yml down -v; exit $EXIT"
   },
   "devDependencies": {
     "@leader/auth": "workspace:*",
     "@leader/db": "workspace:*",
-    "@leader/logging": "workspace:*",
     "@leader/eslint-config": "workspace:*",
+    "@leader/logging": "workspace:*",
     "@leader/tailwind-config": "workspace:*",
     "@leader/ui": "workspace:*",
+    "@playwright/test": "^1.58.2",
     "@sveltejs/adapter-node": "5.5.2",
     "@sveltejs/kit": "2.50.2",
     "@sveltejs/vite-plugin-svelte": "6.2.4",
