@@ -52,8 +52,6 @@
     }
   );
 
-  const emailSourceOptions = ["", "website", "brave"] as const;
-
   $effect(() => {
     updateLeadCore.fields.set({
       leadId: leadData.lead.id,
@@ -62,9 +60,6 @@
       phone: leadData.lead.phone ?? undefined,
       website: leadData.lead.website ?? undefined,
       address: leadData.lead.address ?? undefined,
-      emailSource: leadData.lead.emailSource as
-        | (typeof emailSourceOptions)[number]
-        | undefined,
     });
   });
 </script>
@@ -234,31 +229,6 @@
               </Field.Error>
             {/if}
           </Field.Field>
-
-          <label class="flex flex-col gap-2">
-            <span
-              class="font-mono text-xs font-bold tracking-wider text-neutral-800 uppercase"
-              >Email Source</span
-            >
-            <select
-              name={updateLeadCore.fields.emailSource.as("text").name}
-              value={leadData.lead.emailSource ?? ""}
-              class="focus-visible:border-primary-600 focus-visible:ring-primary-400/40 bg-surface ring-offset-background h-10 w-full border-2 border-neutral-800 px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            >
-              {#each emailSourceOptions as source (source)}
-                <option value={source}>
-                  {source || "Not set"}
-                </option>
-              {/each}
-            </select>
-            {#if updateLeadCore.fields.emailSource.issues()}
-              <p
-                class="text-destructive-600 font-mono text-xs font-bold uppercase"
-              >
-                {updateLeadCore.fields.emailSource.issues()?.[0]?.message}
-              </p>
-            {/if}
-          </label>
 
           <div class="flex justify-end">
             <Button type="submit" disabled={updateLeadCore.pending > 0}>

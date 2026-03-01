@@ -29,7 +29,6 @@ export const lead = pgTable.withRLS(
     types: text("types"),
     website: text("website"),
     email: text("email"),
-    emailSource: text("email_source"),
     phone: text("phone"),
     rating: real("rating"),
     ratingsTotal: integer("ratings_total"),

@@ -1,10 +1,6 @@
 import { leadIdSchema, projectIdSchema } from "@leader/db";
 import * as v from "valibot";
-import {
-  optionalEmailSourceSchema,
-  optionalNumberSchema,
-  optionalStringSchema,
-} from "./common";
+import { optionalNumberSchema, optionalStringSchema } from "./common";
 
 export const projectLeadInputSchema = v.object({
   placeId: v.string(),
@@ -13,7 +9,6 @@ export const projectLeadInputSchema = v.object({
   types: v.optional(v.array(v.string())),
   website: optionalStringSchema,
   email: optionalStringSchema,
-  emailSource: optionalEmailSourceSchema,
   phone: optionalStringSchema,
   rating: optionalNumberSchema,
   ratingsTotal: optionalNumberSchema,

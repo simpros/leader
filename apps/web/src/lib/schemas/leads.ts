@@ -5,7 +5,7 @@ import {
 } from "@leader/db";
 import * as v from "valibot";
 import { MAX_RESULTS_CAP } from "$lib/server/leads/constants";
-import { optionalEmailSourceSchema, optionalStringSchema } from "./common";
+import { optionalStringSchema } from "./common";
 
 export const leadRequestSchema = v.object({
   searchTerm: v.optional(
@@ -69,7 +69,6 @@ export const updateLeadCoreInputSchema = v.object({
   address: optionalStringSchema,
   website: optionalStringSchema,
   email: optionalStringSchema,
-  emailSource: optionalEmailSourceSchema,
   phone: optionalStringSchema,
 });
 

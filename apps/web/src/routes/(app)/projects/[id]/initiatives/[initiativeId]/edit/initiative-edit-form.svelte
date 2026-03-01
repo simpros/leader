@@ -1,47 +1,66 @@
 <script lang="ts">
   import {
-    createInitiativeEmail,
     generateInitiativeEmail,
-    getInitiativeCapabilities,
     sendInitiativeTestEmail,
+    updateInitiativeEmail,
   } from "$lib/remote/initiatives.remote.js";
+  import { getInitiativeCapabilities } from "$lib/remote/initiatives.remote.js";
   import { Button, Input } from "@leader/ui";
   import EmailTemplateEditor from "$lib/components/email-template-editor.svelte";
   import { slide } from "svelte/transition";
 
   import type { Lead } from "$lib/leads/types";
 
-  type InitiativeEmailFormProps = {
+  type Initiative = {
+    id: string;
+    title: string;
+    subject: string;
+    htmlBody: string;
+    status: string;
+  };
+
+  type InitiativeEditFormProps = {
+    initiative: Initiative;
     projectId: string;
     leads?: Lead[];
     onSuccess: () => void;
   };
 
   let {
+    initiative,
     projectId,
     leads = [],
     onSuccess,
-  }: InitiativeEmailFormProps = $props();
+  }: InitiativeEditFormProps = $props();
 
   let errorMessage = $state("");
-  let htmlBody = $state("");
-  let subject = $state("");
+  let htmlBody = $state(initiative.htmlBody);
+  let subject = $state(initiative.subject);
   let showAiGenerate = $state(false);
   let aiPrompt = $state("");
   let aiErrorMessage = $state("");
   let aiGenerating = $state(false);
-  let selectedTestLeadId = $state("");
   let testSendMode = $state<"my-email" | "lead" | "custom">("my-email");
+  let selectedTestLeadId = $state("");
   let customTestEmail = $state("");
   let testSendSuccessMessage = $state("");
   let testSendErrorMessage = $state("");
 
   const capabilities = $derived(await getInitiativeCapabilities());
-  const isSubmitting = $derived(createInitiativeEmail.pending > 0);
+  const isSubmitting = $derived(updateInitiativeEmail.pending > 0);
   const isSendingTestEmail = $derived(sendInitiativeTestEmail.pending > 0);
   const selectableLeads = $derived(
     leads.filter((lead): lead is Lead & { id: string } => Boolean(lead.id))
   );
+
+  $effect(() => {
+    updateInitiativeEmail.fields.set({
+      initiativeId: initiative.id,
+      title: initiative.title,
+      subject: initiative.subject,
+      htmlBody: initiative.htmlBody,
+    });
+  });
 
   $effect(() => {
     if (!selectableLeads.length) {
@@ -80,19 +99,17 @@
     }
   };
 
-  const initiativeForm = createInitiativeEmail.enhance(
-    async ({ submit }) => {
-      errorMessage = "";
+  const editForm = updateInitiativeEmail.enhance(async ({ submit }) => {
+    errorMessage = "";
 
-      try {
-        await submit();
-        onSuccess();
-      } catch (error) {
-        console.error(error);
-        errorMessage = "Unable to create initiative. Try again.";
-      }
+    try {
+      await submit();
+      onSuccess();
+    } catch (error) {
+      console.error(error);
+      errorMessage = "Unable to update initiative. Try again.";
     }
-  );
+  });
 
   const testInitiativeEmailForm = sendInitiativeTestEmail.enhance(
     async ({ submit }) => {
@@ -101,8 +118,7 @@
 
       try {
         await submit();
-        testSendSuccessMessage =
-          "Test email sent successfully.";
+        testSendSuccessMessage = "Test email sent successfully.";
       } catch (error) {
         console.error(error);
         testSendErrorMessage = "Unable to send test email. Try again.";
@@ -111,9 +127,12 @@
   );
 </script>
 
-<form class="space-y-4" {...initiativeForm}>
+<form class="space-y-4" {...editForm}>
   <input
-    {...createInitiativeEmail.fields.projectId.as("hidden", projectId)}
+    {...updateInitiativeEmail.fields.initiativeId.as(
+      "hidden",
+      initiative.id
+    )}
   />
 
   <label class="flex flex-col gap-2">
@@ -122,7 +141,7 @@
     >
     <Input
       placeholder="e.g. February outreach"
-      {...createInitiativeEmail.fields.title.as("text")}
+      {...updateInitiativeEmail.fields.title.as("text")}
     />
   </label>
 
@@ -196,9 +215,9 @@
 
   <EmailTemplateEditor
     bind:value={htmlBody}
-    name={createInitiativeEmail.fields.htmlBody.as("text").name}
+    name={updateInitiativeEmail.fields.htmlBody.as("text").name}
     bind:subject
-    subjectName={createInitiativeEmail.fields.subject.as("text").name}
+    subjectName={updateInitiativeEmail.fields.subject.as("text").name}
     {projectId}
     {leads}
     placeholder="<p>Hello,</p>
@@ -218,7 +237,7 @@
 
   <div class="flex justify-end">
     <Button type="submit" disabled={isSubmitting}>
-      {isSubmitting ? "Saving Draft..." : "Save as Draft"}
+      {isSubmitting ? "Saving..." : "Save Changes"}
     </Button>
   </div>
 </form>

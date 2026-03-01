@@ -1,5 +1,3 @@
-export type LeadEmailSource = "website" | "brave";
-
 export type LeadSearchSource =
   | "google-places"
   | "google-places+openrouter";
@@ -12,7 +10,6 @@ export interface Lead {
   types?: string[] | null;
   website?: string | null;
   email?: string | null;
-  emailSource?: LeadEmailSource | null;
   phone?: string | null;
   rating?: number | null;
   ratingsTotal?: number | null;

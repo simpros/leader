@@ -1,0 +1,1 @@
+ALTER TABLE "lead" DROP COLUMN "email_source";

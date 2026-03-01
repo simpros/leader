@@ -87,13 +87,6 @@
 
       <HiddenInput
         name={getTextFieldName(
-          createProjectWithLeads.fields.leads[leadIndex].emailSource
-        )}
-        value={lead.emailSource}
-      />
-
-      <HiddenInput
-        name={getTextFieldName(
           createProjectWithLeads.fields.leads[leadIndex].phone
         )}
         value={lead.phone}

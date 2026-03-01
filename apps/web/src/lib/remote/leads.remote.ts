@@ -63,7 +63,6 @@ const ensureUserCanAccessLead = async (
       types: schema.lead.types,
       website: schema.lead.website,
       email: schema.lead.email,
-      emailSource: schema.lead.emailSource,
       phone: schema.lead.phone,
       rating: schema.lead.rating,
       ratingsTotal: schema.lead.ratingsTotal,
@@ -186,7 +185,6 @@ export const discoverLeads = form(
         types: details?.types ?? place.types,
         website: details?.websiteUri ?? place.website ?? null,
         email: null,
-        emailSource: null,
         phone:
           details?.nationalPhoneNumber ??
           details?.internationalPhoneNumber ??
@@ -215,7 +213,6 @@ export const discoverLeads = form(
         return {
           ...lead,
           email: enrichment.email,
-          emailSource: enrichment.source,
         };
       })
     );
@@ -472,7 +469,6 @@ export const updateLeadCore = form(
           address: normalize(input.address),
           website: normalize(input.website),
           email: normalize(input.email),
-          emailSource: normalize(input.emailSource),
           phone: normalize(input.phone),
         })
         .where(eq(schema.lead.id, input.leadId))

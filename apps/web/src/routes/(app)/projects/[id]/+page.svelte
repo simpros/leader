@@ -791,6 +791,35 @@
         </div>
 
         {#if selectedInitiative.status === "draft"}
+          <div
+            class="bg-surface flex items-center justify-between border-2 border-neutral-800 px-4 py-3"
+          >
+            <p class="text-sm text-neutral-600">
+              This initiative is still a draft.
+            </p>
+            <div class="flex items-center gap-2">
+              <a
+                href={resolve(
+                  `/projects/${projectData.project.id}/initiatives/${selectedInitiative.id}/edit`
+                )}
+              >
+                <Button variant="ghost" color="neutral" size="sm">
+                  Edit
+                </Button>
+              </a>
+              <Button
+                variant="ghost"
+                color="neutral"
+                size="sm"
+                onclick={() =>
+                  (confirmingInitiativeId = selectedInitiative.id)}
+                disabled={isSending}
+              >
+                Send to Leads
+              </Button>
+            </div>
+          </div>
+
           {#if confirmingInitiativeId === selectedInitiative.id}
             <div
               class="border-secondary-500 bg-secondary-100 border-2 px-4 py-3"
@@ -828,24 +857,6 @@
                   Cancel
                 </Button>
               </form>
-            </div>
-          {:else}
-            <div
-              class="bg-surface flex items-center justify-between border-2 border-neutral-800 px-4 py-3"
-            >
-              <p class="text-sm text-neutral-600">
-                This initiative is still a draft.
-              </p>
-              <Button
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                onclick={() =>
-                  (confirmingInitiativeId = selectedInitiative.id)}
-                disabled={isSending}
-              >
-                Send to Leads
-              </Button>
             </div>
           {/if}
         {:else}
