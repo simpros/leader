@@ -10,6 +10,8 @@ const databaseUrl =
 export const sqlClient = new SQL(databaseUrl);
 export const db = drizzle(databaseUrl, { schema: relations });
 
+export type AppDatabase = typeof db;
+
 export const withRLS = async <T>(
   organizationId: string,
   callback: (
