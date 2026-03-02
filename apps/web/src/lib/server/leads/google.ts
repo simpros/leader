@@ -1,17 +1,3 @@
-type GooglePlaceDetailsResult = {
-  name: string;
-  websiteUri?: string;
-  nationalPhoneNumber?: string;
-  internationalPhoneNumber?: string;
-  formattedAddress?: string;
-  types?: string[];
-  rating?: number;
-  userRatingCount?: number;
-  id: string;
-  googleMapsUri?: string;
-  businessStatus?: string;
-};
-
 export const googleTextSearch = async (apiKey: string, query: string) => {
   const response = await fetch(
     "https://places.googleapis.com/v1/places:searchText",
@@ -30,6 +16,8 @@ export const googleTextSearch = async (apiKey: string, query: string) => {
           "places.internationalPhoneNumber",
           "places.nationalPhoneNumber",
           "places.websiteUri",
+          "places.googleMapsUri",
+          "places.businessStatus",
         ].join(","),
       },
       body: JSON.stringify({ textQuery: query }),
@@ -51,6 +39,10 @@ export const googleTextSearch = async (apiKey: string, query: string) => {
       rating?: number;
       userRatingCount?: number;
       websiteUri?: string;
+      googleMapsUri?: string;
+      businessStatus?: string;
+      nationalPhoneNumber?: string;
+      internationalPhoneNumber?: string;
     }>;
   };
 
@@ -62,37 +54,8 @@ export const googleTextSearch = async (apiKey: string, query: string) => {
     rating: place.rating,
     user_ratings_total: place.userRatingCount,
     website: place.websiteUri,
+    google_maps_uri: place.googleMapsUri,
+    business_status: place.businessStatus,
+    phone: place.nationalPhoneNumber ?? place.internationalPhoneNumber,
   }));
-};
-
-export const googlePlaceDetails = async (
-  apiKey: string,
-  placeId: string
-) => {
-  const response = await fetch(
-    `https://places.googleapis.com/v1/places/${placeId}?fields=${[
-      "id",
-      "displayName",
-      "formattedAddress",
-      "types",
-      "rating",
-      "userRatingCount",
-      "websiteUri",
-      "nationalPhoneNumber",
-      "internationalPhoneNumber",
-      "googleMapsUri",
-      "businessStatus",
-    ].join(",")}`,
-    {
-      headers: {
-        "X-Goog-Api-Key": apiKey,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    return null;
-  }
-
-  return (await response.json()) as GooglePlaceDetailsResult | null;
 };
