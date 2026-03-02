@@ -8,6 +8,8 @@ const PORT = 3000;
 const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
+  globalSetup: "./tests/config/docker.setup.ts",
+  globalTeardown: "./tests/config/docker.teardown.ts",
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
