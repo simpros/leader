@@ -6,8 +6,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const composeFile = join(__dirname, "../docker-compose.e2e.yml");
 
 /**
- * Config-level globalSetup: starts Docker before the webServer boots.
- * In CI the database service is provided externally — Docker is skipped.
+ * @deprecated Docker lifecycle is now managed directly in playwright.config.ts.
+ *
+ * Playwright 1.58+ runs plugins (including webServer) before globalSetup,
+ * so Docker must start at config-load time. This file is kept for reference
+ * but is no longer referenced by the Playwright config.
  */
 export default async function dockerSetup(): Promise<void> {
   if (process.env.CI) {

@@ -1,14 +1,33 @@
 import { defineConfig, devices } from "@playwright/test";
+import { execSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const composeFile = join(__dirname, "tests/docker-compose.e2e.yml");
 
 const PORT = 3000;
 const BASE_URL = `http://localhost:${PORT}`;
 
+/**
+ * Start/stop the e2e database container at config-load time so it is ready
+ * before Playwright boots the webServer plugin.
+ *
+ * Playwright 1.58+ runs plugins (including webServer) *before* globalSetup,
+ * so Docker must be started here — not in a globalSetup file.
+ */
+if (!process.env.CI && !process.env.TEST_WORKER_INDEX) {
+  console.log("🐳 Starting e2e database container...");
+  execSync(`docker compose -f ${composeFile} down -v 2>/dev/null || true`, {
+    stdio: "inherit",
+  });
+  execSync(`docker compose -f ${composeFile} up -d --wait`, {
+    stdio: "inherit",
+  });
+  console.log("✅ Database container started\n");
+}
+
 export default defineConfig({
-  globalSetup: "./tests/config/docker.setup.ts",
   globalTeardown: "./tests/config/docker.teardown.ts",
   testDir: "./tests",
   fullyParallel: true,
