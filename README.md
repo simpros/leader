@@ -183,6 +183,21 @@ bun run build
 bun run format
 ```
 
+### Testing
+
+```bash
+# Run all unit & component tests
+bun run test
+
+# Run integration tests (requires Docker)
+bun --cwd packages/db run test:integration
+
+# Run E2E tests (requires Docker)
+bun --cwd apps/web run test:e2e
+```
+
+See [docs/testing.md](docs/testing.md) for the full testing guide — architecture, debugging, CI/CD details, and how to write new tests.
+
 ### Database Commands
 
 ```bash
