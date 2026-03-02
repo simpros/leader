@@ -13,8 +13,8 @@
     "db:studio": "drizzle-kit studio",
     "check": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "bun test $(find src -name '*.test.ts' -not -name '*.integration.test.ts') --timeout 60000",
-    "test:integration": "bun test src/**/*.integration.test.ts --timeout 120000"
+    "test": "bun test $(find src -name '*.test.ts') --timeout 60000",
+    "test:integration": "bun test src/**/*.integration-test.ts --timeout 120000"
   },
   "dependencies": {
     "nanoid": "^5.1.6",

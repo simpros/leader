@@ -1,6 +1,6 @@
 import { plugin } from "bun";
 import { readFileSync } from "fs";
-import { dirname } from "path";
+import { dirname, join } from "path";
 import { afterEach } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
@@ -27,6 +27,13 @@ async function getCompiler(filePath: string) {
 plugin({
   name: "svelte-loader",
   setup(builder) {
+    // Redirect svelte's server entry to the client entry so mount/hydrate
+    // are available in tests. This replaces the need for --conditions browser.
+    builder.onLoad({ filter: /svelte\/src\/index-server\.js$/ }, (args) => {
+      const clientPath = args.path.replace("index-server.js", "index-client.js");
+      return { contents: readFileSync(clientPath, "utf-8"), loader: "js" };
+    });
+
     // Compile .svelte.js and .svelte.ts rune modules
     builder.onLoad(
       { filter: /\.svelte\.[jt]s$/ },
