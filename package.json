@@ -42,5 +42,8 @@
     "turbo": "^2.4.0",
     "typescript-eslint": "^8.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "patchedDependencies": {
+    "playwright@1.58.2": "patches/playwright@1.58.2.patch"
+  }
 }

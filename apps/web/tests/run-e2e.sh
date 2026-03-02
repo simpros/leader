@@ -17,4 +17,4 @@ docker compose -f "$COMPOSE_FILE" down -v 2>/dev/null || true
 docker compose -f "$COMPOSE_FILE" up -d --wait
 
 echo "🧪 Running Playwright tests..."
-playwright test "$@"
+bun run playwright test "$@"
