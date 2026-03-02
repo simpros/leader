@@ -48,6 +48,7 @@ describe("Button", () => {
   });
 
   it("passes extra attributes to the button", () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render(Button, { "aria-label": "Test" } as any);
     expect(screen.getByRole("button").getAttribute("aria-label")).toBe("Test");
   });

@@ -1,5 +1,3 @@
-import type { AppDatabase } from "@leader/db";
-
 export const TEST_USER = {
   name: "Test User",
   email: "test@leader.local",

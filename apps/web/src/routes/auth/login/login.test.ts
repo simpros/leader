@@ -1,5 +1,5 @@
 import { describe, it, expect, mock, beforeEach } from "bun:test";
-import { render, screen, fireEvent } from "@testing-library/svelte";
+import { render, screen } from "@testing-library/svelte";
 
 const mockGoto = mock(() => Promise.resolve());
 const mockResolve = mock((path: string) => path);

@@ -1,11 +1,12 @@
 import { expect, test as setup } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { TEST_ADMIN, TEST_USER } from "./fixtures";
 import { waitForHydration } from "./fixtures/utils";
 
 const authDir = "tests/.auth";
 
 async function loginAndSaveState(
-  page: import("@playwright/test").Page,
+  page: Page,
   email: string,
   password: string,
   path: string,

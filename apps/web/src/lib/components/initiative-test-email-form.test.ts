@@ -21,15 +21,14 @@ mock.module("$lib/remote/initiatives.remote.js", () => ({
 }));
 
 mock.module("$app/server", () => ({
-  query: (fn: Function) => fn,
-  form: (_fn: Function) => createFormMock(),
-  command: (_fn: Function) => createCommandMock(),
+  query: (fn: (...args: unknown[]) => unknown) => fn,
+  form: () => createFormMock(),
+  command: () => createCommandMock(),
   getRequestEvent: () => ({}),
 }));
 
-const { default: InitiativeTestEmailForm } = await import(
-  "./initiative-test-email-form.svelte"
-);
+const { default: InitiativeTestEmailForm } =
+  await import("./initiative-test-email-form.svelte");
 
 describe("InitiativeTestEmailForm", () => {
   const baseProps = {
@@ -42,7 +41,7 @@ describe("InitiativeTestEmailForm", () => {
     render(InitiativeTestEmailForm, baseProps);
     const headings = document.querySelectorAll(".text-sm.font-semibold");
     const found = Array.from(headings).some(
-      (h) => h.textContent?.trim() === "Send Test Email",
+      (h) => h.textContent?.trim() === "Send Test Email"
     );
     expect(found).toBe(true);
   });
@@ -50,15 +49,13 @@ describe("InitiativeTestEmailForm", () => {
   it("renders the description", () => {
     render(InitiativeTestEmailForm, baseProps);
     expect(
-      screen.getByText(/Send a test of this initiative/),
+      screen.getByText(/Send a test of this initiative/)
     ).toBeTruthy();
   });
 
   it("renders radio buttons for send modes", () => {
     render(InitiativeTestEmailForm, baseProps);
-    expect(
-      screen.getByText("My email (signed-in account)"),
-    ).toBeTruthy();
+    expect(screen.getByText("My email (signed-in account)")).toBeTruthy();
     expect(screen.getByText("Lead's email")).toBeTruthy();
     expect(screen.getByText("Custom email")).toBeTruthy();
   });
@@ -72,7 +69,7 @@ describe("InitiativeTestEmailForm", () => {
   it("has my-email selected by default", () => {
     render(InitiativeTestEmailForm, baseProps);
     const myEmailRadio = document.querySelector(
-      'input[type="radio"][value="my-email"]',
+      'input[type="radio"][value="my-email"]'
     ) as HTMLInputElement;
     expect(myEmailRadio?.checked).toBe(true);
   });
@@ -80,7 +77,7 @@ describe("InitiativeTestEmailForm", () => {
   it("renders submit button", () => {
     render(InitiativeTestEmailForm, baseProps);
     expect(
-      screen.getByRole("button", { name: "Send Test Email" }),
+      screen.getByRole("button", { name: "Send Test Email" })
     ).toBeTruthy();
   });
 
@@ -98,7 +95,7 @@ describe("InitiativeTestEmailForm", () => {
     // The warning only shows when lead mode is selected,
     // which requires user interaction. Test that the form renders cleanly.
     expect(
-      screen.getByRole("button", { name: "Send Test Email" }),
+      screen.getByRole("button", { name: "Send Test Email" })
     ).toBeTruthy();
   });
 });

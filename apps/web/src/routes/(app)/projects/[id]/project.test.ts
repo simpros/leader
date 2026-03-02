@@ -86,7 +86,7 @@ mock.module("$lib/remote/leads.remote", () => ({
 
 mock.module("runed/kit", () => ({
   createSearchParamsSchema: (schema: unknown) => schema,
-  useSearchParams: (_schema: unknown) => ({ initiative: "" }),
+  useSearchParams: () => ({ initiative: "" }),
 }));
 
 mock.module("svelte/transition", () => ({

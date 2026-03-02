@@ -1,7 +1,6 @@
 import {
   expect,
   loginAsUser,
-  STORAGE_STATE_ADMIN,
   STORAGE_STATE_GUEST,
   STORAGE_STATE_USER,
   test,

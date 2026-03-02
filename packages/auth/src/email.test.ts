@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach, spyOn } from "bun:test";
+import { describe, it, expect, mock, beforeEach } from "bun:test";
 
 // Mock nodemailer before importing email module
 const mockSendMail = mock(() =>

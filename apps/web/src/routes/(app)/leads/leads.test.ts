@@ -61,8 +61,8 @@ mock.module("$app/paths", () => ({
 }));
 
 mock.module("$app/server", () => ({
-  query: (fn: Function) => fn,
-  form: (_fn: Function) => createFormMock(),
+  query: (fn: (...args: unknown[]) => unknown) => fn,
+  form: () => createFormMock(),
   getRequestEvent: () => ({}),
 }));
 

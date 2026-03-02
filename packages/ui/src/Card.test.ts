@@ -30,10 +30,10 @@ describe("Card", () => {
   });
 
   it("passes extra attributes", () => {
-    const { container } = render(Card, {
+    render(Card, {
       "data-testid": "my-card",
       children: textSnippet("Test"),
-    } as any);
+    });
     expect(screen.getByTestId("my-card")).toBeTruthy();
   });
 });

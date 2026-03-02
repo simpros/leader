@@ -11,22 +11,22 @@ export function createFormMock(returnValue: unknown = { error: null }) {
     {},
     {
       get: (_target, prop) => {
-        if (prop === "set") return (_values: unknown) => {};
+        if (prop === "set") return () => {};
         return {
-          as: (..._args: unknown[]) => ({ name: "field", value: "" }),
+          as: () => ({ name: "field", value: "" }),
         };
       },
     },
   );
 
-  const enhanceFn = (_callback?: Function) => ({
+  const enhanceFn = () => ({
     action: "?/action",
     method: "POST",
   });
 
-  const addFormApi = (target: Function) =>
+  const addFormApi = (target: (...args: unknown[]) => unknown) =>
     Object.assign(target, {
-      for: (_id: string) => addFormApi(mock(() => Promise.resolve(returnValue))),
+      for: () => addFormApi(mock(() => Promise.resolve(returnValue))),
       pending: 0,
       enhance: enhanceFn,
       fields: fieldProxy,
@@ -74,9 +74,9 @@ export function mockSvelteKitModules() {
   }));
 
   mock.module("$app/server", () => ({
-    query: (fn: Function) => fn,
-    form: (_fn: Function) => createFormMock(),
-    command: (_fn: Function) => createCommandMock(),
+    query: (fn: (...args: unknown[]) => unknown) => fn,
+    form: () => createFormMock(),
+    command: () => createCommandMock(),
     getRequestEvent: () => ({}),
   }));
 

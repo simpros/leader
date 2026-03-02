@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { sql } from "drizzle-orm";
-import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { setupTestDb, teardownTestDb } from "./__tests__/setup";
 import { organization } from "./auth-schema";
+import type { Id } from "./id";
 import { project } from "./schemas/projects.schema";
 import { lead } from "./schemas/leads.schema";
 
 type TestDb = Awaited<ReturnType<typeof setupTestDb>>["db"];
 let db: TestDb;
-let container: StartedPostgreSqlContainer;
 
 const ORG_A_ID = "org-a-test";
 const ORG_B_ID = "org-b-test";
@@ -33,7 +32,6 @@ async function testWithRLS<T>(
 beforeAll(async () => {
   const setup = await setupTestDb();
   db = setup.db;
-  container = setup.container;
 
   // Enable RLS on the tables and force it for table owner (superuser)
   await db.execute(sql`ALTER TABLE project ENABLE ROW LEVEL SECURITY`);
@@ -93,7 +91,7 @@ describe("withRLS", () => {
     // Insert projects for both orgs (bypasses RLS since no SET is applied)
     await db.insert(project).values([
       {
-        id: "prj_org_a_test_00001" as any,
+        id: "prj_org_a_test_00001" as Id<"project">,
         organizationId: ORG_A_ID,
         name: "Project A",
         userId: USER_ID,
@@ -101,7 +99,7 @@ describe("withRLS", () => {
         updatedAt: new Date(),
       },
       {
-        id: "prj_org_b_test_00001" as any,
+        id: "prj_org_b_test_00001" as Id<"project">,
         organizationId: ORG_B_ID,
         name: "Project B",
         userId: USER_ID,
@@ -132,14 +130,14 @@ describe("withRLS", () => {
   it("prevents cross-org data access for leads", async () => {
     await db.insert(lead).values([
       {
-        id: "led_org_a_test_0001" as any,
+        id: "led_org_a_test_0001" as Id<"lead">,
         organizationId: ORG_A_ID,
         placeId: "place-a-1",
         name: "Lead A",
         createdAt: new Date(),
       },
       {
-        id: "led_org_b_test_0001" as any,
+        id: "led_org_b_test_0001" as Id<"lead">,
         organizationId: ORG_B_ID,
         placeId: "place-b-1",
         name: "Lead B",
@@ -167,7 +165,7 @@ describe("withRLS", () => {
       return tx
         .insert(lead)
         .values({
-          id: "led_rls_insert_001" as any,
+          id: "led_rls_insert_001" as Id<"lead">,
           organizationId: ORG_A_ID,
           placeId: "place-rls-test",
           name: "RLS Insert Test",
