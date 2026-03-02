@@ -31,7 +31,7 @@ describe("parseJsonContent", () => {
 
   it("returns parsed object even without queries field", () => {
     const result = parseJsonContent('{"other":"value"}');
-    expect(result).toEqual({ other: "value" });
+    expect(result as unknown).toEqual({ other: "value" });
   });
 });
 

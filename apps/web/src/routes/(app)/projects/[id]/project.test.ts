@@ -97,6 +97,27 @@ mock.module("svelte/transition", () => ({
 const { default: ProjectPage } = await import("./+page.svelte");
 
 describe("Project page", () => {
+  const mockData = {
+    locale: "en-US",
+    user: {
+      id: "user-1",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      email: "test@example.com",
+      emailVerified: true,
+      name: "Test User",
+      image: null,
+      banned: null,
+      role: "user",
+      banReason: null,
+      banExpires: null,
+    },
+    memberRole: "admin" as string | null,
+    session: {
+      activeOrganizationId: "org-1",
+    },
+  } as const;
+
   beforeEach(() => {
     mockGetProjectData.mockClear();
     mockGetProjectInitiatives.mockClear();
@@ -109,7 +130,7 @@ describe("Project page", () => {
   it("renders the project name in heading", async () => {
     render(ProjectPage, {
       params: { id: "proj-1" },
-      data: { locale: "en-US" },
+      data: mockData,
     });
     await waitFor(() => {
       expect(
@@ -121,7 +142,7 @@ describe("Project page", () => {
   it("renders the project description", async () => {
     render(ProjectPage, {
       params: { id: "proj-1" },
-      data: { locale: "en-US" },
+      data: mockData,
     });
     await waitFor(() => {
       expect(
@@ -133,7 +154,7 @@ describe("Project page", () => {
   it("renders initiative titles", async () => {
     render(ProjectPage, {
       params: { id: "proj-1" },
-      data: { locale: "en-US" },
+      data: mockData,
     });
     await waitFor(() => {
       expect(screen.getByText("Welcome Email")).toBeTruthy();
@@ -143,7 +164,7 @@ describe("Project page", () => {
   it("renders lead count in leads tab", async () => {
     render(ProjectPage, {
       params: { id: "proj-1" },
-      data: { locale: "en-US" },
+      data: mockData,
     });
     await waitFor(() => {
       expect(screen.getByText("Leads")).toBeTruthy();
@@ -153,7 +174,7 @@ describe("Project page", () => {
   it("renders breadcrumbs with Projects link", async () => {
     render(ProjectPage, {
       params: { id: "proj-1" },
-      data: { locale: "en-US" },
+      data: mockData,
     });
     await waitFor(() => {
       expect(screen.getByText("Projects")).toBeTruthy();

@@ -1,7 +1,7 @@
 import { describe, it, expect, mock, beforeEach } from "bun:test";
 
 // Mock nodemailer before importing email module
-const mockSendMail = mock(() =>
+const mockSendMail = mock((_opts: Record<string, unknown>) =>
   Promise.resolve({ messageId: "test-msg-id-123" }),
 );
 mock.module("nodemailer", () => ({
@@ -17,7 +17,7 @@ const { sendEmail, emailFrom } = await import("./email");
 describe("sendEmail", () => {
   beforeEach(() => {
     mockSendMail.mockClear();
-    mockSendMail.mockImplementation(() =>
+    mockSendMail.mockImplementation((_opts: Record<string, unknown>) =>
       Promise.resolve({ messageId: "test-msg-id-123" }),
     );
   });
@@ -30,7 +30,7 @@ describe("sendEmail", () => {
     });
 
     expect(mockSendMail).toHaveBeenCalledTimes(1);
-    const call = mockSendMail.mock.calls[0]![0] as Record<string, unknown>;
+    const call = mockSendMail.mock.calls[0]![0];
     expect(call.to).toBe("user@example.com");
     expect(call.subject).toBe("Test Subject");
     expect(call.html).toBe("<p>Hello</p>");
@@ -44,7 +44,7 @@ describe("sendEmail", () => {
       html: "<p>Hello <strong>World</strong></p>",
     });
 
-    const call = mockSendMail.mock.calls[0]![0] as Record<string, unknown>;
+    const call = mockSendMail.mock.calls[0]![0];
     expect(call.text).toBe("Hello World");
   });
 
@@ -56,7 +56,7 @@ describe("sendEmail", () => {
       text: "Custom text",
     });
 
-    const call = mockSendMail.mock.calls[0]![0] as Record<string, unknown>;
+    const call = mockSendMail.mock.calls[0]![0];
     expect(call.text).toBe("Custom text");
   });
 
@@ -71,7 +71,7 @@ describe("sendEmail", () => {
   });
 
   it("throws on transporter failure", async () => {
-    mockSendMail.mockImplementation(() =>
+    mockSendMail.mockImplementation((_opts: Record<string, unknown>) =>
       Promise.reject(new Error("SMTP connection refused")),
     );
 

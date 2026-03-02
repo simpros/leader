@@ -83,8 +83,8 @@ describe("InitiativeTestEmailForm", () => {
 
   it("renders lead dropdown when leads provided", () => {
     const leads = [
-      { id: "l1", name: "Acme Corp", email: "a@acme.com" },
-      { id: "l2", name: "Beta Inc", email: "b@beta.com" },
+      { id: "l1", placeId: "place_1", name: "Acme Corp", email: "a@acme.com" },
+      { id: "l2", placeId: "place_2", name: "Beta Inc", email: "b@beta.com" },
     ];
     render(InitiativeTestEmailForm, { ...baseProps, leads });
     expect(screen.getByText(/Preview lead/)).toBeTruthy();
