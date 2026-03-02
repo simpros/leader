@@ -61,7 +61,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run integration tests
-        run: bun --cwd packages/db run test:integration
+        run: bun run test:integration
 
   test-e2e:
     name: E2E Tests
@@ -82,7 +82,6 @@ jobs:
 
       - name: Run E2E tests
         run: bun run test:e2e
-        working-directory: apps/web
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

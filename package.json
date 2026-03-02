@@ -19,6 +19,8 @@
     "db:studio": "turbo run db:studio",
     "check": "turbo run check",
     "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
     "auth:generate": "turbo run auth:generate"
   },
   "devDependencies": {
