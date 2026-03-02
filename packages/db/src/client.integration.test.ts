@@ -29,9 +29,13 @@ async function testWithRLS<T>(
   });
 }
 
-beforeAll(async () => {
-  const setup = await setupTestDb();
-  db = setup.db;
+// Integration tests require Docker (testcontainers) and only run via test:integration
+const runIntegration = process.env.INTEGRATION === "1";
+
+describe.skipIf(!runIntegration)("withRLS (integration)", () => {
+  beforeAll(async () => {
+    const setup = await setupTestDb();
+    db = setup.db;
 
   // Enable RLS on the tables and force it for table owner (superuser)
   await db.execute(sql`ALTER TABLE project ENABLE ROW LEVEL SECURITY`);
@@ -70,11 +74,10 @@ beforeAll(async () => {
   `);
 }, 120_000);
 
-afterAll(async () => {
-  await teardownTestDb();
-});
+  afterAll(async () => {
+    await teardownTestDb();
+  });
 
-describe("withRLS", () => {
   it("sets current_org_id config within transaction", async () => {
     const result = await testWithRLS(db, ORG_A_ID, async (tx) => {
       const rows = await tx.execute(
