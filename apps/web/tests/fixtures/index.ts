@@ -6,17 +6,7 @@ import { SettingsPage } from "./settings-page";
 export { waitForHydration } from "./utils";
 
 // Test user credentials — seeded by global setup
-export const TEST_USER = {
-  name: "Test User",
-  email: "test@leader.local",
-  password: "Test@123456",
-};
-
-export const TEST_ADMIN = {
-  name: "Test Admin",
-  email: "testadmin@leader.local",
-  password: "Admin@123456",
-};
+export { TEST_USER, TEST_ADMIN } from "./credentials";
 
 // Storage state paths
 export const STORAGE_STATE_USER = "tests/.auth/user.json";

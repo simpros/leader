@@ -7,13 +7,14 @@
     "dev": "vite dev",
     "db:seed": "bun ./src/seed.ts",
     "build": "vite build",
+    "postbuild": "cp -r ../../packages/db/drizzle build/server/drizzle",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "bun test --conditions browser",
-    "test:e2e": "vite build && cp -r ../../packages/db/drizzle build/server/drizzle && docker compose -f tests/docker-compose.e2e.yml down -v 2>/dev/null; docker compose -f tests/docker-compose.e2e.yml up -d --wait && playwright test; EXIT=$?; docker compose -f tests/docker-compose.e2e.yml down -v; exit $EXIT"
+    "test:e2e": "bash tests/run-e2e.sh"
   },
   "devDependencies": {
     "@leader/auth": "workspace:*",
