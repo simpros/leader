@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
+import {
+  PostgreSqlContainer,
+  type StartedPostgreSqlContainer,
+} from "@testcontainers/postgresql";
 import { Wait } from "testcontainers";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
@@ -37,18 +40,10 @@ export async function setupTestDb(): Promise<{
   connectionUri: string;
   container: StartedPostgreSqlContainer;
 }> {
-  // Custom wait strategy: the default forListeningPorts() includes an
-  // internal-port exec check that hangs under Bun + VM-based Docker runtimes.
-  // Log message ×2 ensures PG completes its init/restart cycle; the health
   // check (pg_isready) adds a Docker-level readiness gate that also gives the
   // host port mapping time to stabilise.
-  container = await new PostgreSqlContainer("postgres:16-alpine")
-    .withWaitStrategy(
-      Wait.forAll([
-        Wait.forLogMessage(/database system is ready to accept connections/, 2),
-        Wait.forHealthCheck(),
-      ])
-    )
+  container = await new PostgreSqlContainer("postgres:18-alpine")
+    .withWaitStrategy(Wait.forHealthCheck())
     .start();
   const connectionUri = container.getConnectionUri();
 
@@ -62,7 +57,10 @@ export async function setupTestDb(): Promise<{
     } catch {
       sqlClient?.close();
       sqlClient = null;
-      if (attempt >= 4) throw new Error("Could not connect to test database after 5 attempts");
+      if (attempt >= 4)
+        throw new Error(
+          "Could not connect to test database after 5 attempts"
+        );
       await new Promise((r) => setTimeout(r, 500));
     }
   }
