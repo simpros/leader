@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,6 +26,13 @@ if (!process.env.CI && !process.env.TEST_WORKER_INDEX) {
     stdio: "inherit",
   });
   console.log("✅ Database container started\n");
+
+  const buildEntry = join(__dirname, "build/index.js");
+  if (!existsSync(buildEntry)) {
+    console.log("🔨 Building app for e2e tests...");
+    execSync("bun run build", { stdio: "inherit", cwd: __dirname });
+    console.log("✅ Build complete\n");
+  }
 }
 
 export default defineConfig({

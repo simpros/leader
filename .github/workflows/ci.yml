@@ -31,6 +31,13 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/build/
+          retention-days: 1
+
   test:
     name: Unit & Component Tests
     runs-on: ubuntu-latest
@@ -65,6 +72,7 @@ jobs:
 
   test-e2e:
     name: E2E Tests
+    needs: lint-and-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,6 +83,12 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/build/
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
