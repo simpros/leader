@@ -14,7 +14,7 @@
     "check": "tsc --noEmit",
     "lint": "eslint .",
     "test": "bun test ./**/*.test.ts --timeout 60000",
-    "test:integration": "INTEGRATION=1 bun test ./**/*.integration.ts --timeout 120000"
+    "test:integration": "INTEGRATION=1 bun test ./**/*.integration-test.ts --timeout 120000"
   },
   "dependencies": {
     "nanoid": "^5.1.6",

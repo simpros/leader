@@ -29,7 +29,7 @@ The root `bun run test` command runs `turbo run test`, which executes the `test`
 
 | Package | Command | What it tests |
 | --- | --- | --- |
-| `packages/db` | `bun test $(find src -name '*.test.ts')` | ID generation, schema validation |
+| `packages/db` | `bun test ./**/*.test.ts` | ID generation, schema validation |
 | `packages/auth` | `bun test` | Email template rendering |
 | `packages/logging` | `bun test` | Dynatrace sink formatting, log filters |
 | `packages/ui` | `bun test --conditions browser` | Svelte component rendering (Badge, Button, Card, etc.) |
