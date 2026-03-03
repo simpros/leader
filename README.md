@@ -269,9 +269,9 @@ Contributions are welcome! Please open an issue or pull request.
 
 ### Maintainer: Telemetry Build Configuration
 
-The official Docker image embeds Dynatrace credentials at **build time** so end users don't need to configure them. These are stored as GitHub Actions secrets and passed as Docker build args during CI:
+The official Docker image embeds Dynatrace credentials at **build time** via [Docker BuildKit secrets](https://docs.docker.com/build/building/secrets/) so end users don't need to configure them. These are stored as GitHub Actions secrets and passed during CI:
 
-| Build Arg                    | GitHub Secret                | Description                                           |
+| Build Secret                 | GitHub Secret                | Description                                           |
 | ---------------------------- | ---------------------------- | ----------------------------------------------------- |
 | `DYNATRACE_LOG_INGEST_URL`  | `DYNATRACE_LOG_INGEST_URL`  | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`) |
 | `DYNATRACE_API_TOKEN`       | `DYNATRACE_API_TOKEN`       | Dynatrace API token with `logs.ingest` scope          |
@@ -279,13 +279,15 @@ The official Docker image embeds Dynatrace credentials at **build time** so end 
 To build locally with telemetry:
 
 ```bash
+export DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest
+export DYNATRACE_API_TOKEN=dt0c01.XXXX
 docker build \
-  --build-arg DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest \
-  --build-arg DYNATRACE_API_TOKEN=dt0c01.XXXX \
+  --secret id=DYNATRACE_LOG_INGEST_URL \
+  --secret id=DYNATRACE_API_TOKEN \
   -t leader apps/web
 ```
 
-If neither arg is provided, the image runs with console-only logging (telemetry becomes a no-op regardless of `LEADER_TELEMETRY`).
+If neither secret is provided, the image runs with console-only logging (telemetry becomes a no-op regardless of `LEADER_TELEMETRY`).
 
 ## License
 
