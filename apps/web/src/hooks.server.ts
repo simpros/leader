@@ -9,7 +9,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { building } from "$app/environment";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { auth } from "@leader/auth";
-import { db, eq, runMigrations, schema, withRLS } from "@leader/db";
+import { and, db, eq, runMigrations, schema, withRLS } from "@leader/db";
 import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
 import { randomUUIDv7 } from "bun";
@@ -32,6 +32,8 @@ const envContext = Object.freeze({
 const LOGIN_PATH = "/auth/login";
 const LOGIN_ROUTE_ID = "/auth";
 const AUTH_API_ROUTE_PREFIX = "/api/auth";
+const ACCEPT_INVITATION_ROUTE_PREFIX = "/accept-invitation";
+const SIGN_UP_PATH = "/api/auth/sign-up/email";
 
 const getRequestLocale = (headers: Headers) => {
   const [locale] = headers.get("accept-language")?.split(",") ?? [];
@@ -48,8 +50,16 @@ const shouldAllowRequest = (event: Parameters<Handle>[0]["event"]) => {
   const isStaticRoute = routeId === null;
   const isLoginPage = routeId?.startsWith(LOGIN_ROUTE_ID) ?? false;
   const isHealthCheck = routeId === "/health";
+  const isAcceptInvitation =
+    routeId?.startsWith(ACCEPT_INVITATION_ROUTE_PREFIX) ?? false;
 
-  return isAuthApi || isLoginPage || isStaticRoute || isHealthCheck;
+  return (
+    isAuthApi ||
+    isLoginPage ||
+    isStaticRoute ||
+    isHealthCheck ||
+    isAcceptInvitation
+  );
 };
 
 const handleUnauthenticated = (event: Parameters<Handle>[0]["event"]) => {
@@ -121,6 +131,41 @@ const sessionHandle: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
+const signUpGuardHandle: Handle = async ({ event, resolve }) => {
+  if (
+    event.url.pathname === SIGN_UP_PATH &&
+    event.request.method === "POST"
+  ) {
+    const cloned = event.request.clone();
+    const body = await cloned.json().catch(() => null);
+    const email = (body as Record<string, unknown> | null)?.email;
+
+    if (typeof email === "string") {
+      const [invitation] = await db
+        .select({ id: schema.invitation.id })
+        .from(schema.invitation)
+        .where(
+          and(
+            eq(schema.invitation.email, email),
+            eq(schema.invitation.status, "pending")
+          )
+        )
+        .limit(1);
+
+      if (!invitation) {
+        return new Response(
+          JSON.stringify({
+            message: "Registration requires a valid invitation",
+          }),
+          { status: 403, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+  }
+
+  return resolve(event);
+};
+
 const permissionHandle: Handle = async ({ event, resolve }) => {
   if (!shouldAllowRequest(event)) {
     return handleUnauthenticated(event);
@@ -185,5 +230,6 @@ export const handle = sequence(
   wideEventHandle,
   requestLocaleHandle,
   sessionHandle,
+  signUpGuardHandle,
   permissionHandle
 );
