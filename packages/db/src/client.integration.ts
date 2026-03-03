@@ -32,7 +32,8 @@ async function testWithRLS<T>(
 // Integration tests require Docker (testcontainers) and only run via test:integration
 const runIntegration = process.env.INTEGRATION === "1";
 
-describe.skipIf(!runIntegration)("withRLS (integration)", () => {
+runIntegration &&
+  describe("withRLS (integration)", () => {
   beforeAll(async () => {
     const setup = await setupTestDb();
     db = setup.db;
@@ -180,4 +181,4 @@ describe.skipIf(!runIntegration)("withRLS (integration)", () => {
     expect(newLead).toHaveLength(1);
     expect(newLead[0].name).toBe("RLS Insert Test");
   });
-});
+  });
