@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "bun test --conditions browser",
-    "test:e2e": "PW_DISABLE_TS_ESM=1 bun --bun --env-file=.env.e2e playwright test"
+    "test:e2e": "bun --bun --env-file=.env.e2e playwright test"
   },
   "devDependencies": {
     "@leader/auth": "workspace:*",
