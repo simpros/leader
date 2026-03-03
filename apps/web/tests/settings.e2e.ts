@@ -1,4 +1,10 @@
-import { expect, STORAGE_STATE_ADMIN, STORAGE_STATE_USER, test } from "./fixtures";
+import {
+  expect,
+  STORAGE_STATE_ADMIN,
+  STORAGE_STATE_USER,
+  TEST_INVITATION,
+  test,
+} from "./fixtures";
 
 test.describe("Settings", () => {
   test.describe("Profile", () => {
@@ -37,6 +43,37 @@ test.describe("Settings", () => {
       await settingsPage.gotoOrganisation();
       await expect(settingsPage.inviteEmailInput).toBeVisible();
       await expect(settingsPage.sendInvitationButton).toBeVisible();
+    });
+
+    test("should show pending invitations section", async ({
+      settingsPage,
+    }) => {
+      await settingsPage.gotoOrganisation();
+      await expect(settingsPage.pendingInvitationsHeading).toBeVisible();
+    });
+
+    test("should display seeded invitation in table", async ({
+      settingsPage,
+    }) => {
+      await settingsPage.gotoOrganisation();
+      await expect(
+        settingsPage.invitationsTable.getByText(TEST_INVITATION.email),
+      ).toBeVisible();
+    });
+
+    test("should show resend and cancel buttons for invitation", async ({
+      settingsPage,
+    }) => {
+      await settingsPage.gotoOrganisation();
+      const row = settingsPage.invitationsTable.getByRole("row", {
+        name: new RegExp(TEST_INVITATION.email),
+      });
+      await expect(
+        row.getByRole("button", { name: /resend/i }),
+      ).toBeVisible();
+      await expect(
+        row.getByRole("button", { name: /cancel/i }),
+      ).toBeVisible();
     });
   });
 });
