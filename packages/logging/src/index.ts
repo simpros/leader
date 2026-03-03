@@ -24,6 +24,14 @@ export async function configureLogging(): Promise<void> {
     sinks.dynatrace = dt.sink;
     sinkNames.push("dynatrace");
     dynatraceDispose = dt.dispose;
+    console.log("[logging] Dynatrace sink configured");
+  } else {
+    const reasons = [
+      !telemetryEnabled && "LEADER_TELEMETRY=false",
+      !dtUrl && "DYNATRACE_LOG_INGEST_URL not set",
+      !dtToken && "DYNATRACE_API_TOKEN not set",
+    ].filter(Boolean);
+    console.warn(`[logging] Dynatrace sink disabled: ${reasons.join(", ")}`);
   }
 
   await configure({

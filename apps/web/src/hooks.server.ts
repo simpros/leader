@@ -222,7 +222,9 @@ const wideEventHandle: Handle = async ({ event, resolve }) => {
     if (event.locals.session?.activeOrganizationId) {
       wideEvent.organization_id = event.locals.session.activeOrganizationId;
     }
-    logger.info("request {method} {path} {status_code}", wideEvent);
+    if (event.route.id !== "/health") {
+      logger.info("request {method} {path} {status_code}", wideEvent);
+    }
   }
 };
 
