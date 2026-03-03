@@ -1,4 +1,5 @@
 import { test as base, type Page } from "@playwright/test";
+import { AcceptInvitationPage } from "./accept-invitation-page";
 import { LeadsPage } from "./leads-page";
 import { ProjectsPage } from "./projects-page";
 import { SettingsPage } from "./settings-page";
@@ -6,7 +7,7 @@ import { SettingsPage } from "./settings-page";
 export { waitForHydration } from "./utils";
 
 // Test user credentials — seeded by global setup
-export { TEST_USER, TEST_ADMIN } from "./credentials";
+export { TEST_USER, TEST_ADMIN, TEST_INVITATION } from "./credentials";
 
 // Storage state paths
 export const STORAGE_STATE_USER = "tests/.auth/user.json";
@@ -18,6 +19,7 @@ export const test = base.extend<{
   projectsPage: ProjectsPage;
   leadsPage: LeadsPage;
   settingsPage: SettingsPage;
+  acceptInvitationPage: AcceptInvitationPage;
 }>({
   projectsPage: async ({ page }, use) => {
     await use(new ProjectsPage(page));
@@ -27,6 +29,9 @@ export const test = base.extend<{
   },
   settingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));
+  },
+  acceptInvitationPage: async ({ page }, use) => {
+    await use(new AcceptInvitationPage(page));
   },
 });
 

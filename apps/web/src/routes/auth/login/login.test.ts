@@ -13,6 +13,11 @@ mock.module("$app/navigation", () => ({
   onNavigate: () => {},
 }));
 mock.module("$app/paths", () => ({ resolve: mockResolve }));
+mock.module("$app/state", () => ({
+	page: {
+		url: new URL("http://localhost/auth/login"),
+	},
+}));
 mock.module("@leader/auth/client", () => ({
   authClient: {
     signIn: {

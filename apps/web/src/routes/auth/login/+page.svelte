@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { authClient } from "@leader/auth/client";
   import { Button, Card, Input } from "@leader/ui";
 
@@ -8,6 +8,8 @@
   let password = $state("");
   let isSubmitting = $state(false);
   let errorMessage = $state<string | null>(null);
+
+  const redirectTo = page.url.searchParams.get("redirectTo") || "/";
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
@@ -22,7 +24,7 @@
     const { error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/",
+      callbackURL: redirectTo,
     });
 
     isSubmitting = false;
@@ -32,7 +34,8 @@
       return;
     }
 
-    await goto(resolve("/"));
+    // eslint-disable-next-line svelte/no-navigation-without-resolve
+    await goto(redirectTo);
   };
 </script>
 

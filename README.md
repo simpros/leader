@@ -82,6 +82,44 @@ The app is available at [http://localhost:5173](http://localhost:5173).
 | `OPENROUTER_API_KEY`    | No       | OpenRouter API key for AI-powered search |
 | `OPENROUTER_MODEL`      | No       | OpenRouter model name (default: `openai/gpt-4o-mini`) |
 
+#### Obtaining API Keys
+
+<details>
+<summary><strong>Google Places API Key</strong> (required)</summary>
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project (or select an existing one).
+3. Navigate to **APIs & Services → Library** and enable the **Places API (New)**.
+4. Go to **APIs & Services → Credentials** and click **Create Credentials → API key**.
+5. (Recommended) Click **Edit API key** and restrict it to the **Places API (New)** under "API restrictions".
+6. Copy the key and set it as `GOOGLE_PLACES_API_KEY` in your `.env` file.
+
+> **Pricing:** Google offers a $200/month free tier for Maps Platform APIs. See the [Google Maps pricing page](https://developers.google.com/maps/billing-credits) for details.
+
+</details>
+
+<details>
+<summary><strong>Brave Search API Key</strong> (optional — used for lead enrichment)</summary>
+
+1. Sign up at [Brave Search API](https://brave.com/search/api/).
+2. Choose a plan — the **Free** tier includes 2,000 queries/month.
+3. After signing in, go to your [API dashboard](https://api.search.brave.com/app/dashboard) and copy your API key.
+4. Set it as `BRAVE_API_KEY` in your `.env` file.
+
+</details>
+
+<details>
+<summary><strong>OpenRouter API Key</strong> (optional — used for AI-powered search)</summary>
+
+1. Create an account at [OpenRouter](https://openrouter.ai/).
+2. Go to **Keys** in your dashboard and click **Create Key**.
+3. Copy the key and set it as `OPENROUTER_API_KEY` in your `.env` file.
+4. Optionally set `OPENROUTER_MODEL` to choose a different model (default: `openai/gpt-4o-mini`). Browse available models at [openrouter.ai/models](https://openrouter.ai/models).
+
+> **Pricing:** Each model has its own per-token price. Many models offer a free tier. See the [OpenRouter models page](https://openrouter.ai/models) for current pricing.
+
+</details>
+
 #### Email (SMTP)
 
 | Variable    | Required | Description                                  |

@@ -22,6 +22,10 @@ export class SettingsPage {
   readonly inviteEmailInput: Locator;
   readonly sendInvitationButton: Locator;
 
+  // Invitations
+  readonly pendingInvitationsHeading: Locator;
+  readonly invitationsTable: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -52,6 +56,12 @@ export class SettingsPage {
     this.sendInvitationButton = page.getByRole("button", {
       name: /send invitation/i,
     });
+
+    // Invitations
+    this.pendingInvitationsHeading = page.getByRole("heading", {
+      name: /pending invitations/i,
+    });
+    this.invitationsTable = page.locator("table");
   }
 
   async gotoProfile() {

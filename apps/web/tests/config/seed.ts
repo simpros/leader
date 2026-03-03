@@ -1,6 +1,6 @@
-import { TEST_USER, TEST_ADMIN } from "../fixtures/credentials";
+import { TEST_USER, TEST_ADMIN, TEST_INVITATION } from "../fixtures/credentials";
 
-export { TEST_USER, TEST_ADMIN };
+export { TEST_USER, TEST_ADMIN, TEST_INVITATION };
 
 /**
  * Create test users and organization using better-auth API + direct DB.
@@ -98,4 +98,36 @@ export async function createTestUsers(): Promise<void> {
   }
 
   console.log("✅ Organization & memberships ready");
+
+  // Create a pending invitation for E2E testing
+  console.log("📧 Ensuring pending invitation...");
+
+  const [adminUser] = await db
+    .select({ id: schema.user.id })
+    .from(schema.user)
+    .where(eq(schema.user.email, TEST_ADMIN.email))
+    .limit(1);
+
+  if (adminUser) {
+    const [existingInvitation] = await db
+      .select({ id: schema.invitation.id })
+      .from(schema.invitation)
+      .where(eq(schema.invitation.id, TEST_INVITATION.id))
+      .limit(1);
+
+    if (!existingInvitation) {
+      await db.insert(schema.invitation).values({
+        id: TEST_INVITATION.id,
+        organizationId: orgId,
+        email: TEST_INVITATION.email,
+        role: "member",
+        status: "pending",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        inviterId: adminUser.id,
+      });
+    }
+  }
+
+  console.log("✅ Pending invitation ready");
 }
