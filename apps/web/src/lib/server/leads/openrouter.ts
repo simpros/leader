@@ -11,7 +11,7 @@ type OpenRouterOptions = {
   model?: string | null;
 };
 
-const getContentText = (content: unknown): string | null => {
+export const getContentText = (content: unknown): string | null => {
   if (typeof content === "string") {
     return content;
   }

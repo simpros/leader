@@ -27,7 +27,7 @@ const CONTACT_PATH_HINTS = [
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-const normalizeWebsiteUrl = (value?: string | null) => {
+export const normalizeWebsiteUrl = (value?: string | null) => {
   if (!value) {
     return null;
   }
@@ -67,13 +67,13 @@ const fetchText = async (url: string, timeoutMs = 8000) => {
   }
 };
 
-const extractEmails = (text: string) => {
+export const extractEmails = (text: string) => {
   const matches = text.match(EMAIL_REGEX) ?? [];
   const unique = Array.from(new Set(matches.map((value) => value.trim())));
   return unique.filter((value) => value.length <= 254);
 };
 
-const isLikelyBusinessEmail = (email: string) => {
+export const isLikelyBusinessEmail = (email: string) => {
   const lower = email.toLowerCase();
   const blockedPrefixes = ["noreply", "no-reply", "donotreply"];
 
@@ -84,7 +84,7 @@ const isLikelyBusinessEmail = (email: string) => {
   return true;
 };
 
-const pickBestEmail = (emails: string[]) => {
+export const pickBestEmail = (emails: string[]) => {
   if (!emails.length) {
     return null;
   }
@@ -93,7 +93,7 @@ const pickBestEmail = (emails: string[]) => {
   return filtered[0] ?? emails[0] ?? null;
 };
 
-const extractCandidateLinks = (html: string, baseUrl: string) => {
+export const extractCandidateLinks = (html: string, baseUrl: string) => {
   const linkMatches = html.matchAll(/href\s*=\s*["']([^"']+)["']/gi);
   const links: string[] = [];
 

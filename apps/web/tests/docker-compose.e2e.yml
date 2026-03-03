@@ -1,0 +1,16 @@
+services:
+  db-e2e:
+    image: postgres:18-alpine
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: e2e_test
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U test -d e2e_test']
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql

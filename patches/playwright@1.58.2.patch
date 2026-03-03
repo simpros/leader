@@ -1,0 +1,14 @@
+diff --git a/lib/transform/transform.js b/lib/transform/transform.js
+index 715bcce88b2bcc5647718f3c58bb1ebdd9585fa0..133886791f49dc888a82788acefdd233660611bb 100644
+--- a/lib/transform/transform.js
++++ b/lib/transform/transform.js
+@@ -219,7 +219,8 @@ async function requireOrImport(file) {
+   if (isModule) {
+     const fileName = import_url.default.pathToFileURL(file);
+     const esmImport = () => eval(`import(${JSON.stringify(fileName)})`);
+-    await eval(`import(${JSON.stringify(fileName + ".esm.preflight")})`).finally(nextTask);
++    if (typeof globalThis.Bun === "undefined")
++      await eval(`import(${JSON.stringify(fileName + ".esm.preflight")})`).finally(nextTask);
+     return await esmImport().finally(nextTask);
+   }
+   const result = require(file);

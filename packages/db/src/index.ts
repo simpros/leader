@@ -1,4 +1,5 @@
 export { db, sqlClient, withRLS } from "./client";
+export type { AppDatabase } from "./client";
 export { runMigrations } from "./migrate";
 export {
   ID_PREFIX,

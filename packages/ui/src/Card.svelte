@@ -1,8 +1,15 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import type { HTMLAttributes } from "svelte/elements";
   import { tv } from "tailwind-variants";
 
   type CardVariant = "glass" | "flat";
+
+  interface Props extends HTMLAttributes<HTMLDivElement> {
+    variant?: CardVariant;
+    className?: string;
+    children?: Snippet;
+  }
 
   let {
     variant = "flat",
@@ -10,12 +17,7 @@
     class: restClass = "",
     children,
     ...restProps
-  } = $props<{
-    variant?: CardVariant;
-    className?: string;
-    class?: string;
-    children?: Snippet;
-  }>();
+  }: Props = $props();
 
   const card = tv({
     base: "border-2 border-neutral-800 p-4 transition-[background-color,border-color,box-shadow] duration-100 ease-out",

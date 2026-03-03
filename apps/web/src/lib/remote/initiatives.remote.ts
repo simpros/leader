@@ -18,6 +18,7 @@ import {
   createInitiativeEmailInputSchema,
   generateInitiativeEmailInputSchema,
   sendInitiativeTestEmailInputSchema,
+  updateInitiativeEmailInputSchema,
 } from "$lib/schemas";
 import { sendEmail } from "$lib/server/email";
 import {
@@ -221,6 +222,69 @@ export const createInitiativeEmail = form(
   }
 );
 
+export const updateInitiativeEmail = form(
+  updateInitiativeEmailInputSchema,
+  async (input) => {
+    addRequestLogContext({ action: "updateInitiativeEmail", initiative_id: input.initiativeId });
+    const { locals } = getRequestEvent();
+    const userId = locals.user?.id;
+    const organizationId = locals.session?.activeOrganizationId;
+    if (!userId || !organizationId) throw error(401, "Unauthorized");
+
+    const title = input.title.trim();
+    const subject = input.subject.trim();
+    const htmlBody = input.htmlBody.trim();
+
+    if (!title) throw error(400, "Initiative title is required");
+    if (!subject) throw error(400, "Email subject is required");
+    if (!htmlBody) throw error(400, "Email body is required");
+
+    return locals.db(async (tx) => {
+      const [existing] = await tx
+        .select({
+          id: schema.initiative.id,
+          projectId: schema.initiative.projectId,
+          status: schema.initiative.status,
+        })
+        .from(schema.initiative)
+        .where(eq(schema.initiative.id, input.initiativeId))
+        .limit(1);
+
+      if (!existing) throw error(404, "Initiative not found");
+
+      await ensureProjectAccess(existing.projectId, userId, tx);
+
+      if (existing.status !== "draft") {
+        throw error(400, "Only draft initiatives can be edited");
+      }
+
+      const [updated] = await tx
+        .update(schema.initiative)
+        .set({
+          title,
+          subject,
+          htmlBody,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(schema.initiative.id, input.initiativeId),
+            eq(schema.initiative.status, "draft")
+          )
+        )
+        .returning({ id: schema.initiative.id });
+
+      if (!updated) {
+        throw error(400, "Initiative is no longer a draft");
+      }
+
+      return {
+        initiativeId: updated.id,
+      };
+    });
+  }
+);
+
 export const sendInitiativeTestEmail = form(
   sendInitiativeTestEmailInputSchema,
   async (input) => {
@@ -230,53 +294,84 @@ export const sendInitiativeTestEmail = form(
     const userEmail = locals.user?.email?.trim();
     const organizationId = locals.session?.activeOrganizationId;
     if (!userId || !organizationId) throw error(401, "Unauthorized");
-    if (!userEmail)
-      throw error(400, "Signed-in user does not have an email address");
 
+    const mode = input.mode;
     const subject = input.subject.trim();
     const htmlBody = input.htmlBody.trim();
 
     if (!subject) throw error(400, "Email subject is required");
     if (!htmlBody) throw error(400, "Email body is required");
 
+    let recipientEmail: string;
+
+    if (mode === "my-email") {
+      if (!userEmail)
+        throw error(400, "Signed-in user does not have an email address");
+      recipientEmail = userEmail;
+    } else if (mode === "custom") {
+      const custom = input.customEmail?.trim();
+      if (!custom) throw error(400, "Custom email address is required");
+      recipientEmail = custom;
+    } else {
+      // mode === "lead" — send to the lead's actual email
+      recipientEmail = ""; // will be set below from lead data
+    }
+
     return locals.db(async (tx) => {
       await ensureProjectAccess(input.projectId, userId, tx);
 
-      const [lead] = await tx
-        .select({
-          id: schema.lead.id,
-          placeId: schema.lead.placeId,
-          email: schema.lead.email,
-          name: schema.lead.name,
-          phone: schema.lead.phone,
-          website: schema.lead.website,
-          address: schema.lead.address,
-          rating: schema.lead.rating,
-          googleMapsUrl: schema.lead.googleMapsUrl,
-        })
-        .from(schema.projectLead)
-        .innerJoin(
-          schema.lead,
-          eq(schema.lead.id, schema.projectLead.leadId)
-        )
-        .where(
-          and(
-            eq(schema.projectLead.projectId, input.projectId),
-            eq(schema.projectLead.leadId, input.leadId)
-          )
-        )
-        .limit(1);
+      let resolvedSubject = subject;
+      let resolvedHtmlBody = htmlBody;
 
-      if (!lead) {
-        throw error(404, "Selected lead not found in this project");
+      if (input.leadId) {
+        const [lead] = await tx
+          .select({
+            id: schema.lead.id,
+            placeId: schema.lead.placeId,
+            email: schema.lead.email,
+            name: schema.lead.name,
+            phone: schema.lead.phone,
+            website: schema.lead.website,
+            address: schema.lead.address,
+            rating: schema.lead.rating,
+            googleMapsUrl: schema.lead.googleMapsUrl,
+          })
+          .from(schema.projectLead)
+          .innerJoin(
+            schema.lead,
+            eq(schema.lead.id, schema.projectLead.leadId)
+          )
+          .where(
+            and(
+              eq(schema.projectLead.projectId, input.projectId),
+              eq(schema.projectLead.leadId, input.leadId)
+            )
+          )
+          .limit(1);
+
+        if (!lead) {
+          throw error(404, "Selected lead not found in this project");
+        }
+
+        resolvedSubject = resolveTemplate(subject, lead, []);
+        resolvedHtmlBody = resolveTemplate(htmlBody, lead, []);
+
+        if (mode === "lead") {
+          if (!lead.email?.trim()) {
+            throw error(400, "Selected lead does not have an email address");
+          }
+          recipientEmail = lead.email.trim();
+        }
       }
 
-      const resolvedSubject = resolveTemplate(subject, lead, []);
-      const resolvedHtmlBody = resolveTemplate(htmlBody, lead, []);
-      await sendEmail(userEmail, resolvedSubject, resolvedHtmlBody);
+      if (!recipientEmail) {
+        throw error(400, "Could not determine recipient email");
+      }
+
+      await sendEmail(recipientEmail, resolvedSubject, resolvedHtmlBody);
 
       return {
-        sentTo: userEmail,
+        sentTo: recipientEmail,
       };
     });
   }
@@ -540,6 +635,39 @@ export const retryInitiativeLead = form(
       return {
         initiativeLeadId: initiativeLead.id,
       };
+    });
+  }
+);
+
+export const getInitiative = query(
+  initiativeIdSchema,
+  async (initiativeId) => {
+    addRequestLogContext({ action: "getInitiative", initiative_id: initiativeId });
+    const { locals } = getRequestEvent();
+    const userId = locals.user?.id;
+    const organizationId = locals.session?.activeOrganizationId;
+    if (!userId || !organizationId) throw error(401, "Unauthorized");
+
+    return locals.db(async (tx) => {
+      const [initiative] = await tx
+        .select({
+          id: schema.initiative.id,
+          projectId: schema.initiative.projectId,
+          type: schema.initiative.type,
+          title: schema.initiative.title,
+          subject: schema.initiative.subject,
+          htmlBody: schema.initiative.htmlBody,
+          status: schema.initiative.status,
+        })
+        .from(schema.initiative)
+        .where(eq(schema.initiative.id, initiativeId))
+        .limit(1);
+
+      if (!initiative) throw error(404, "Initiative not found");
+
+      await ensureProjectAccess(initiative.projectId, userId, tx);
+
+      return initiative;
     });
   }
 );

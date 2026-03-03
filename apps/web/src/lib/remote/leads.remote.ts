@@ -22,10 +22,7 @@ import {
 } from "$lib/schemas";
 import { addRequestLogContext } from "$lib/server/request-logging";
 import { enrichEmail } from "$lib/server/leads/email";
-import {
-  googlePlaceDetails,
-  googleTextSearch,
-} from "$lib/server/leads/google";
+import { googleTextSearch } from "$lib/server/leads/google";
 import { getOpenRouterAudienceQueries } from "$lib/server/leads/openrouter";
 import { uniqueStrings } from "$lib/server/leads/utils";
 import { normalize, parseTypes } from "$lib/server/utils/data";
@@ -63,7 +60,6 @@ const ensureUserCanAccessLead = async (
       types: schema.lead.types,
       website: schema.lead.website,
       email: schema.lead.email,
-      emailSource: schema.lead.emailSource,
       phone: schema.lead.phone,
       rating: schema.lead.rating,
       ratingsTotal: schema.lead.ratingsTotal,
@@ -172,32 +168,19 @@ export const discoverLeads = form(
       })
       .slice(0, maxCount);
 
-    const detailsByPlace = await Promise.all(
-      uniquePlaces.map((place) =>
-        googlePlaceDetails(GOOGLE_PLACES_API_KEY, place.place_id)
-      )
-    );
-
-    const baseResults: Lead[] = uniquePlaces.map((place, index) => {
-      const details = detailsByPlace[index];
-      return {
-        name: details?.name ?? place.name,
-        address: details?.formattedAddress ?? place.formatted_address,
-        types: details?.types ?? place.types,
-        website: details?.websiteUri ?? place.website ?? null,
-        email: null,
-        emailSource: null,
-        phone:
-          details?.nationalPhoneNumber ??
-          details?.internationalPhoneNumber ??
-          null,
-        rating: details?.rating ?? place.rating,
-        ratingsTotal: details?.userRatingCount ?? place.user_ratings_total,
-        placeId: place.place_id,
-        googleMapsUrl: details?.googleMapsUri ?? null,
-        businessStatus: details?.businessStatus ?? null,
-      };
-    });
+    const baseResults: Lead[] = uniquePlaces.map((place) => ({
+      name: place.name,
+      address: place.formatted_address ?? null,
+      types: place.types ?? null,
+      website: place.website ?? null,
+      email: null,
+      phone: place.phone ?? null,
+      rating: place.rating ?? null,
+      ratingsTotal: place.user_ratings_total ?? null,
+      placeId: place.place_id,
+      googleMapsUrl: place.google_maps_uri ?? null,
+      businessStatus: place.business_status ?? null,
+    }));
 
     const results = await Promise.all(
       baseResults.map(async (lead) => {
@@ -215,7 +198,6 @@ export const discoverLeads = form(
         return {
           ...lead,
           email: enrichment.email,
-          emailSource: enrichment.source,
         };
       })
     );
@@ -472,7 +454,6 @@ export const updateLeadCore = form(
           address: normalize(input.address),
           website: normalize(input.website),
           email: normalize(input.email),
-          emailSource: normalize(input.emailSource),
           phone: normalize(input.phone),
         })
         .where(eq(schema.lead.id, input.leadId))

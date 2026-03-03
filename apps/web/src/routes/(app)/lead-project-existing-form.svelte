@@ -109,13 +109,6 @@
 
       <HiddenInput
         name={getTextFieldName(
-          existingAddLeadsForm.fields.leads[leadIndex].emailSource
-        )}
-        value={lead.emailSource}
-      />
-
-      <HiddenInput
-        name={getTextFieldName(
           existingAddLeadsForm.fields.leads[leadIndex].phone
         )}
         value={lead.phone}

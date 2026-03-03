@@ -31,6 +31,16 @@
     "check": {
       "dependsOn": ["^build"]
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:integration": {
+      "cache": false
+    },
+    "test:e2e": {
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

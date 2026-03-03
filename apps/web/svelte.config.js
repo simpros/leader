@@ -14,6 +14,11 @@ const config = {
     experimental: {
       remoteFunctions: true,
     },
+    typescript: {
+      config: (tsconfig) => {
+        tsconfig.include.push("../playwright.config.ts");
+      },
+    },
   },
 };
 
