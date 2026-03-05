@@ -17,6 +17,8 @@
         "SMTP_USER",
         "SMTP_PASS",
         "EMAIL_FROM",
+        "DYNATRACE_OTLP_ENDPOINT",
+        "DYNATRACE_API_TOKEN",
         "LEADER_TELEMETRY",
         "BOOTSTRAP_USER_NAME",
         "BOOTSTRAP_USER_EMAIL",

@@ -12,10 +12,12 @@ import { auth } from "@leader/auth";
 import { and, db, eq, runMigrations, schema, withRLS } from "@leader/db";
 import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
+import { getOtelSink } from "$lib/server/telemetry";
 import { randomUUIDv7 } from "bun";
 
 if (!building) {
-  await configureLogging();
+  const otelSink = getOtelSink();
+  await configureLogging(otelSink ? { sinks: { otel: otelSink } } : undefined);
   await runMigrations();
   await ensureInitialUserWithOrganization();
 }

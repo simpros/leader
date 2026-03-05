@@ -31,10 +31,10 @@ RUN bun run build --filter=@leader/web
 FROM base AS runner
 
 ARG COMMIT_SHA
-RUN --mount=type=secret,id=DYNATRACE_LOG_INGEST_URL \
+RUN --mount=type=secret,id=DYNATRACE_OTLP_ENDPOINT \
     --mount=type=secret,id=DYNATRACE_API_TOKEN \
     printf '%s\n%s\n' \
-    "DYNATRACE_LOG_INGEST_URL=$(cat /run/secrets/DYNATRACE_LOG_INGEST_URL)" \
+    "DYNATRACE_OTLP_ENDPOINT=$(cat /run/secrets/DYNATRACE_OTLP_ENDPOINT)" \
     "DYNATRACE_API_TOKEN=$(cat /run/secrets/DYNATRACE_API_TOKEN)" > .env.telemetry
 
 RUN apk add --no-cache curl && \

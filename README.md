@@ -271,18 +271,18 @@ Contributions are welcome! Please open an issue or pull request.
 
 The official Docker image embeds Dynatrace credentials at **build time** via [Docker BuildKit secrets](https://docs.docker.com/build/building/secrets/) so end users don't need to configure them. These are stored as GitHub Actions secrets and passed during CI:
 
-| Build Secret                 | GitHub Secret                | Description                                           |
-| ---------------------------- | ---------------------------- | ----------------------------------------------------- |
-| `DYNATRACE_LOG_INGEST_URL`  | `DYNATRACE_LOG_INGEST_URL`  | Dynatrace log ingest endpoint (`/api/v2/logs/ingest`) |
-| `DYNATRACE_API_TOKEN`       | `DYNATRACE_API_TOKEN`       | Dynatrace API token with `logs.ingest` scope          |
+| Build Secret                 | GitHub Secret                | Description                                                                       |
+| ---------------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
+| `DYNATRACE_OTLP_ENDPOINT`   | `DYNATRACE_OTLP_ENDPOINT`   | Base OTLP endpoint (e.g. `https://xyz.live.dynatrace.com/api/v2/otlp`)           |
+| `DYNATRACE_API_TOKEN`       | `DYNATRACE_API_TOKEN`       | Dynatrace API token with `logs.ingest` + `openTelemetryTrace.ingest` scopes      |
 
 To build locally with telemetry:
 
 ```bash
-export DYNATRACE_LOG_INGEST_URL=https://xyz.live.dynatrace.com/api/v2/logs/ingest
+export DYNATRACE_OTLP_ENDPOINT=https://xyz.live.dynatrace.com/api/v2/otlp
 export DYNATRACE_API_TOKEN=dt0c01.XXXX
 docker build \
-  --secret id=DYNATRACE_LOG_INGEST_URL \
+  --secret id=DYNATRACE_OTLP_ENDPOINT \
   --secret id=DYNATRACE_API_TOKEN \
   -t leader apps/web
 ```
