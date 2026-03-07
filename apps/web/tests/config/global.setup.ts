@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Project-based setup: run migrations and seed test data.
- * Docker is already running via config-level globalSetup (docker.setup.ts).
+ * Docker is already running via config-level setup in playwright.config.ts.
  */
 setup("global setup", async () => {
   console.log("\n🚀 Running E2E migrations & seeding...\n");

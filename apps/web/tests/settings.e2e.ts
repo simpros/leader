@@ -3,6 +3,7 @@ import {
   STORAGE_STATE_ADMIN,
   STORAGE_STATE_USER,
   TEST_INVITATION,
+  TEST_USER,
   test,
 } from "./fixtures";
 
@@ -27,6 +28,30 @@ test.describe("Settings", () => {
       await expect(settingsPage.newPasswordInput).toBeVisible();
       await expect(settingsPage.confirmPasswordInput).toBeVisible();
       await expect(settingsPage.changePasswordButton).toBeVisible();
+    });
+
+    test("should update profile name", async ({ settingsPage }) => {
+      await settingsPage.gotoProfile();
+
+      const updatedName = `Test User ${Date.now()}`;
+      await settingsPage.profileNameInput.fill(updatedName);
+      await settingsPage.profileSaveButton.click();
+
+      // Verify success feedback
+      await expect(
+        settingsPage.page.getByText(/profile updated/i),
+      ).toBeVisible({ timeout: 5_000 });
+
+      // Reload and verify persistence
+      await settingsPage.gotoProfile();
+      await expect(settingsPage.profileNameInput).toHaveValue(updatedName);
+
+      // Restore original name
+      await settingsPage.profileNameInput.fill(TEST_USER.name);
+      await settingsPage.profileSaveButton.click();
+      await expect(
+        settingsPage.page.getByText(/profile updated/i),
+      ).toBeVisible({ timeout: 5_000 });
     });
   });
 
@@ -74,6 +99,32 @@ test.describe("Settings", () => {
       await expect(
         row.getByRole("button", { name: /cancel/i }),
       ).toBeVisible();
+    });
+
+    test("should update organisation name", async ({ settingsPage }) => {
+      await settingsPage.gotoOrganisation();
+
+      const originalName = await settingsPage.orgNameInput.inputValue();
+      const updatedName = `Leader ${Date.now()}`;
+
+      await settingsPage.orgNameInput.fill(updatedName);
+      await settingsPage.orgSaveButton.click();
+
+      // Verify success feedback
+      await expect(
+        settingsPage.page.getByText(/organisation updated/i),
+      ).toBeVisible({ timeout: 5_000 });
+
+      // Reload and verify persistence
+      await settingsPage.gotoOrganisation();
+      await expect(settingsPage.orgNameInput).toHaveValue(updatedName);
+
+      // Restore original name
+      await settingsPage.orgNameInput.fill(originalName);
+      await settingsPage.orgSaveButton.click();
+      await expect(
+        settingsPage.page.getByText(/organisation updated/i),
+      ).toBeVisible({ timeout: 5_000 });
     });
   });
 });
