@@ -10,6 +10,7 @@
   let errorMessage = $state<string | null>(null);
 
   const redirectTo = page.url.searchParams.get("redirectTo") || "/";
+  const allowSignUp = $derived(page.data.allowSignUp);
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
@@ -98,5 +99,17 @@
         {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>
     </form>
+
+    {#if allowSignUp}
+      <p class="text-center text-sm text-neutral-500">
+        Don't have an account?
+        <a
+          href="/auth/sign-up"
+          class="text-primary-600 hover:text-primary-700 font-semibold"
+        >
+          Create one
+        </a>
+      </p>
+    {/if}
   </Card>
 </main>
