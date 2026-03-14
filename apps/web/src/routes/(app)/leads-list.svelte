@@ -232,7 +232,7 @@
         class="flex w-full flex-wrap items-center justify-between gap-3"
       >
         <div
-          class="font-mono text-xs font-bold tracking-wider text-neutral-100 uppercase"
+          class="font-mono text-xs font-bold tracking-wider text-neutral-500 uppercase"
         >
           {selectionLabel}
         </div>
