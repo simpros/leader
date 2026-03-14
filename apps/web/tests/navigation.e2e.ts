@@ -31,9 +31,8 @@ test.describe("Navigation", () => {
     await expect(nav.first()).toBeVisible({ timeout: 5_000 });
 
     const projectsLink = page.getByRole("link", { name: /projects/i });
-    if (await projectsLink.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      await projectsLink.click();
-      await expect(page).toHaveURL("/projects");
-    }
+    await expect(projectsLink).toBeVisible();
+    await projectsLink.click();
+    await expect(page).toHaveURL("/projects");
   });
 });

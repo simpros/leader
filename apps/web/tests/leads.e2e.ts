@@ -11,16 +11,10 @@ test.describe("Leads", () => {
   test("should show empty state or lead list", async ({ leadsPage }) => {
     await leadsPage.goto();
 
-    const hasLeads = await leadsPage.leadCards
-      .first()
-      .isVisible({ timeout: 5_000 })
-      .catch(() => false);
-    const hasEmptyState = await leadsPage.page
-      .getByText(/no leads yet/i)
-      .isVisible({ timeout: 1_000 })
-      .catch(() => false);
-
-    expect(hasLeads || hasEmptyState).toBeTruthy();
+    // Wait for the page to fully render, then assert one of the two states
+    await expect(
+      leadsPage.leadCards.first().or(leadsPage.page.getByText(/no leads/i)),
+    ).toBeVisible();
   });
 
   test("should have add-lead button", async ({ leadsPage }) => {

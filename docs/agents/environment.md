@@ -13,7 +13,19 @@ OPENROUTER_API_KEY=optional
 OPENROUTER_MODEL=openai/gpt-4o-mini
 BRAVE_API_KEY=optional
 LEADER_TELEMETRY=true
+DYNATRACE_OTLP_ENDPOINT=https://{env-id}.live.dynatrace.com/api/v2/otlp
+DYNATRACE_API_TOKEN=dt0c01.XXXXX
 ```
+
+### Telemetry environment variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `LEADER_TELEMETRY` | No | Set to `false` to disable telemetry. Defaults to enabled. |
+| `DYNATRACE_OTLP_ENDPOINT` | No | Base OTLP endpoint for Dynatrace (e.g. `https://{env-id}.live.dynatrace.com/api/v2/otlp`). SDK appends `/v1/traces` and `/v1/logs`. |
+| `DYNATRACE_API_TOKEN` | No | Dynatrace API token. Needs scopes: `logs.ingest`, `openTelemetryTrace.ingest`. |
+
+Both `DYNATRACE_OTLP_ENDPOINT` and `DYNATRACE_API_TOKEN` must be set for telemetry export. When missing, only console logging is active.
 
 ## Database
 

@@ -13,6 +13,12 @@ const config = {
     adapter: adapter(),
     experimental: {
       remoteFunctions: true,
+      tracing: {
+        server: true,
+      },
+      instrumentation: {
+        server: true,
+      },
     },
     typescript: {
       config: (tsconfig) => {

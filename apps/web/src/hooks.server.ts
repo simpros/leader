@@ -12,10 +12,14 @@ import { auth } from "@leader/auth";
 import { and, db, eq, runMigrations, schema, withRLS } from "@leader/db";
 import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
+import { getOtelSink } from "$lib/server/telemetry";
 import { randomUUIDv7 } from "bun";
 
 if (!building) {
-  await configureLogging();
+  const otelSink = getOtelSink();
+  await configureLogging(
+    otelSink ? { sinks: { otel: otelSink } } : undefined
+  );
   await runMigrations();
   await ensureInitialUserWithOrganization();
 }
@@ -220,7 +224,8 @@ const wideEventHandle: Handle = async ({ event, resolve }) => {
       wideEvent.user_id = event.locals.user.id;
     }
     if (event.locals.session?.activeOrganizationId) {
-      wideEvent.organization_id = event.locals.session.activeOrganizationId;
+      wideEvent.organization_id =
+        event.locals.session.activeOrganizationId;
     }
     if (event.route.id !== "/health") {
       logger.info("request {method} {path} {status_code}", wideEvent);
