@@ -77,6 +77,10 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.organization.id,
       to: r.initiativeConversation.organizationId,
     }),
+    smtpConfig: r.many.organizationSmtpConfig({
+      from: r.organization.id,
+      to: r.organizationSmtpConfig.organizationId,
+    }),
   },
   member: {
     organization: r.one.organization({
@@ -220,6 +224,12 @@ export const relations = defineRelations(schema, (r) => ({
     initiativeLead: r.one.initiativeLead({
       from: r.initiativeConversation.initiativeLeadId,
       to: r.initiativeLead.id,
+    }),
+  },
+  organizationSmtpConfig: {
+    organization: r.one.organization({
+      from: r.organizationSmtpConfig.organizationId,
+      to: r.organization.id,
     }),
   },
 }));
