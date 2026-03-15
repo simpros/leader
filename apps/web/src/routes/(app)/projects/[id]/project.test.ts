@@ -99,6 +99,7 @@ const { default: ProjectPage } = await import("./+page.svelte");
 describe("Project page", () => {
   const mockData = {
     locale: "en-US",
+    allowSignUp: false,
     user: {
       id: "user-1",
       createdAt: new Date(),

@@ -1,6 +1,6 @@
-import { TEST_USER, TEST_ADMIN, TEST_INVITATION } from "../fixtures/credentials";
+import { TEST_USER, TEST_ADMIN, TEST_INVITATION, TEST_SECOND_ORG } from "../fixtures/credentials";
 
-export { TEST_USER, TEST_ADMIN, TEST_INVITATION };
+export { TEST_USER, TEST_ADMIN, TEST_INVITATION, TEST_SECOND_ORG };
 
 /**
  * Create test users and organization using better-auth API + direct DB.
@@ -130,4 +130,52 @@ export async function createTestUsers(): Promise<void> {
   }
 
   console.log("✅ Pending invitation ready");
+
+  // Create second organization for multi-org testing (org switcher)
+  console.log("🏢 Ensuring second organization...");
+
+  const [existingSecondOrg] = await db
+    .select({ id: schema.organization.id })
+    .from(schema.organization)
+    .where(eq(schema.organization.slug, TEST_SECOND_ORG.slug))
+    .limit(1);
+
+  const secondOrgId =
+    existingSecondOrg?.id ??
+    (
+      await db
+        .insert(schema.organization)
+        .values({
+          id: crypto.randomUUID(),
+          name: TEST_SECOND_ORG.name,
+          slug: TEST_SECOND_ORG.slug,
+          createdAt: new Date(),
+        })
+        .returning({ id: schema.organization.id })
+    )[0].id;
+
+  // Add admin as owner of the second org (so org switcher appears)
+  if (adminUser) {
+    // Only add if admin doesn't already have a membership in the second org
+    const adminMemberships = await db
+      .select({ id: schema.member.id, organizationId: schema.member.organizationId })
+      .from(schema.member)
+      .where(eq(schema.member.userId, adminUser.id));
+
+    const hasSecondOrg = adminMemberships.some(
+      (m) => m.organizationId === secondOrgId
+    );
+
+    if (!hasSecondOrg) {
+      await db.insert(schema.member).values({
+        id: crypto.randomUUID(),
+        organizationId: secondOrgId,
+        userId: adminUser.id,
+        role: "owner",
+        createdAt: new Date(),
+      });
+    }
+  }
+
+  console.log("✅ Second organization & admin membership ready");
 }

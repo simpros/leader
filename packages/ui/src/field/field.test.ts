@@ -1,11 +1,11 @@
 import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/svelte";
 import { createRawSnippet } from "svelte";
-import Field from "./Field.svelte";
-import Label from "./Label.svelte";
-import ErrorComp from "./Error.svelte";
-import Description from "./Description.svelte";
-import Group from "./Group.svelte";
+import Field from "./field.svelte";
+import Label from "./label.svelte";
+import ErrorComp from "./error.svelte";
+import Description from "./description.svelte";
+import Group from "./group.svelte";
 
 const textSnippet = (text: string) =>
   createRawSnippet(() => ({

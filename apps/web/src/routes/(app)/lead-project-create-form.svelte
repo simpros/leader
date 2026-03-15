@@ -42,7 +42,7 @@
 
 <div class="mt-4 space-y-3">
   <form class="space-y-3" {...createProjectAndAddLeadsForm}>
-    {#each selectedLeadsList as lead, leadIndex (leadIndex)}
+    {#each selectedLeadsList as lead, leadIndex (lead.placeId)}
       <input
         {...createProjectWithLeads.fields.leads[leadIndex].placeId.as(
           "hidden",
@@ -63,7 +63,7 @@
         value={lead.address}
       />
 
-      {#each lead.types as type, typeIndex (typeIndex)}
+      {#each lead.types as type, typeIndex (type)}
         <input
           {...createProjectWithLeads.fields.leads[leadIndex].types[
             typeIndex

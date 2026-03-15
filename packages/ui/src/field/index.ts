@@ -1,5 +1,5 @@
-export { default as Field } from "./Field.svelte";
-export { default as Label } from "./Label.svelte";
-export { default as Error } from "./Error.svelte";
-export { default as Description } from "./Description.svelte";
-export { default as Group } from "./Group.svelte";
+export { default as Field } from "./field.svelte";
+export { default as Label } from "./label.svelte";
+export { default as Error } from "./error.svelte";
+export { default as Description } from "./description.svelte";
+export { default as Group } from "./group.svelte";

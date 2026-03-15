@@ -4,10 +4,10 @@
     href?: string;
   };
 
-  let { items, class: className = "" } = $props<{
+  let { items, class: className = "" }: {
     items: BreadcrumbItem[];
     class?: string;
-  }>();
+  } = $props();
 </script>
 
 <nav
@@ -18,7 +18,7 @@
   ]}
 >
   <span class="bg-primary-500 inline-block h-3 w-3"></span>
-  {#each items as item, i (i)}
+  {#each items as item, i (item.href ?? item.label)}
     {@const isLast = i === items.length - 1}
     {#if i > 0}
       <span aria-hidden="true" class="text-neutral-400">//</span>

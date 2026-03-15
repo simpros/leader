@@ -6,6 +6,7 @@
   import OrganisationMembersTable from "./organisation-members-table.svelte";
   import OrganisationInvitationsTable from "./organisation-invitations-table.svelte";
   import OrganisationInviteForm from "./organisation-invite-form.svelte";
+  import OrganisationSmtpForm from "./organisation-smtp-form.svelte";
 
   const org = createOrganizationState();
   const currentUserId = $derived(page.data.user?.id);
@@ -17,6 +18,7 @@
 
 <div class="flex flex-col gap-8">
   <OrganisationDetailsForm organization={page.data.organization} />
+  <OrganisationSmtpForm />
   <OrganisationMembersTable
     members={org.members}
     loading={org.loading}

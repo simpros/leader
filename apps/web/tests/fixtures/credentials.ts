@@ -14,3 +14,8 @@ export const TEST_INVITATION = {
   id: "e2e-test-invitation-001",
   email: "invited@leader.local",
 };
+
+export const TEST_SECOND_ORG = {
+  name: "Acme Corp",
+  slug: "acme-corp",
+};

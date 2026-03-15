@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/svelte";
-import Breadcrumbs from "./Breadcrumbs.svelte";
+import Breadcrumbs from "./breadcrumbs.svelte";
 
 describe("Breadcrumbs", () => {
   it("renders a nav with breadcrumb label", () => {

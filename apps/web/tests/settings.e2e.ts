@@ -126,5 +126,41 @@ test.describe("Settings", () => {
         settingsPage.page.getByText(/organisation updated/i),
       ).toBeVisible({ timeout: 5_000 });
     });
+
+    test("should display SMTP configuration form", async ({
+      settingsPage,
+    }) => {
+      await settingsPage.gotoOrganisation();
+      await expect(settingsPage.smtpHeading).toBeVisible();
+      await expect(settingsPage.smtpHostInput).toBeVisible();
+      await expect(settingsPage.smtpPortInput).toBeVisible();
+      await expect(settingsPage.smtpUserInput).toBeVisible();
+      await expect(settingsPage.smtpPassInput).toBeVisible();
+      await expect(settingsPage.smtpEmailFromInput).toBeVisible();
+    });
+
+    test("should show SMTP save and test buttons", async ({
+      settingsPage,
+    }) => {
+      await settingsPage.gotoOrganisation();
+      await expect(settingsPage.smtpSaveButton).toBeVisible();
+      await expect(settingsPage.smtpTestButton).toBeVisible();
+    });
+
+    test("should have default SMTP port value", async ({ settingsPage }) => {
+      await settingsPage.gotoOrganisation();
+      await expect(settingsPage.smtpPortInput).toHaveValue("587");
+    });
+  });
+
+  test.describe("Organisation (Member — no access)", () => {
+    test.use({ storageState: STORAGE_STATE_USER });
+
+    test("should deny access to organisation settings for regular member", async ({
+      page,
+    }) => {
+      const response = await page.goto("/settings/organisation");
+      expect(response?.status()).toBe(403);
+    });
   });
 });

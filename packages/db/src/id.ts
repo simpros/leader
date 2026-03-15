@@ -10,6 +10,7 @@ export const ID_PREFIX = {
   initiative: "ini",
   initiativeLead: "inl",
   initiativeConversation: "inc",
+  organizationSmtpConfig: "osc",
 } as const;
 
 export type IdKind = keyof typeof ID_PREFIX;
@@ -50,4 +51,7 @@ export const initiativeIdSchema = idSchema("initiative");
 export const initiativeLeadIdSchema = idSchema("initiativeLead");
 export const initiativeConversationIdSchema = idSchema(
   "initiativeConversation"
+);
+export const organizationSmtpConfigIdSchema = idSchema(
+  "organizationSmtpConfig"
 );

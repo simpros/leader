@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/svelte";
 import { createRawSnippet } from "svelte";
-import Button from "./Button.svelte";
+import Button from "./button.svelte";
 
 const textSnippet = (text: string) =>
   createRawSnippet(() => ({

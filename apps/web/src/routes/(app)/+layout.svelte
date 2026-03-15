@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import UserAvatarMenu from "./user-avatar-menu.svelte";
+  import OrgSwitcher from "./org-switcher.svelte";
 
   let { children } = $props();
 
@@ -24,12 +25,21 @@
     <div
       class="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6"
     >
-      <a
-        href={resolve("/")}
-        class="hover:text-primary-600 shrink-0 py-3 font-mono text-base font-bold tracking-[0.2em] text-neutral-950 uppercase transition-colors sm:text-lg sm:tracking-[0.3em]"
-      >
-        Leader
-      </a>
+      <div class="flex items-center">
+        <a
+          href={resolve("/")}
+          class="hover:text-primary-600 shrink-0 py-3 font-mono text-base font-bold tracking-[0.2em] text-neutral-950 uppercase transition-colors sm:text-lg sm:tracking-[0.3em]"
+        >
+          Leader
+        </a>
+        <div class="border-l-2 border-neutral-800">
+          <OrgSwitcher
+            organizations={page.data.organizations ?? []}
+            activeOrganizationId={page.data.session?.activeOrganizationId ??
+              null}
+          />
+        </div>
+      </div>
       <div class="flex items-center">
         <nav
           class="flex flex-wrap items-center"

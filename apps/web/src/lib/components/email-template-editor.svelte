@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { Debounced } from "runed";
   import type { Lead } from "$lib/leads/types";
   import { getProjectCustomFields } from "$lib/remote/projects.remote.js";
@@ -180,13 +179,9 @@
     menuOpen = false;
   }
 
-  onMount(() => {
-    window.addEventListener("keydown", handleKeydown);
-    return () => {
-      window.removeEventListener("keydown", handleKeydown);
-    };
-  });
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <TemplateVariableMenu
   open={menuOpen}

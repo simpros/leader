@@ -15,6 +15,7 @@ BRAVE_API_KEY=optional
 LEADER_TELEMETRY=true
 DYNATRACE_OTLP_ENDPOINT=https://{env-id}.live.dynatrace.com/api/v2/otlp
 DYNATRACE_API_TOKEN=dt0c01.XXXXX
+ALLOW_SIGN_UP=false
 ```
 
 ### Telemetry environment variables
@@ -26,6 +27,16 @@ DYNATRACE_API_TOKEN=dt0c01.XXXXX
 | `DYNATRACE_API_TOKEN` | No | Dynatrace API token. Needs scopes: `logs.ingest`, `openTelemetryTrace.ingest`. |
 
 Both `DYNATRACE_OTLP_ENDPOINT` and `DYNATRACE_API_TOKEN` must be set for telemetry export. When missing, only console logging is active.
+
+### Multi-org / sign-up variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `ALLOW_SIGN_UP` | No | `false` | Set to `true` to enable public sign-up (creates user + org). Requires tracing to be configured. |
+
+Organisation SMTP passwords are encrypted at rest using a key derived from `BETTER_AUTH_SECRET` (via HKDF). No additional encryption key is needed.
+
+**Important:** When `ALLOW_SIGN_UP=true`, the server will refuse to start unless `DYNATRACE_OTLP_ENDPOINT` and `DYNATRACE_API_TOKEN` are set and `LEADER_TELEMETRY` is not `false`.
 
 ## Database
 
