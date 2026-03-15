@@ -21,3 +21,14 @@
 - Environment and DB: [docs/agents/environment.md](docs/agents/environment.md)
 - apps/web notes: [docs/agents/apps-web.md](docs/agents/apps-web.md)
 - Conventions: [docs/agents/conventions.md](docs/agents/conventions.md)
+
+# Testing rule
+
+**MANDATORY**: When adding a new feature or modifying an existing one, always add or update unit tests for the affected code. No feature is considered complete without corresponding test coverage.
+
+- New schemas (`$lib/schemas/`) must have validation tests (valid input, boundary values, rejection cases).
+- New server-side utilities or services (`$lib/server/`) must have unit tests with appropriate mocking.
+- New ID kinds (`packages/db/src/id.ts`) must be added to the `ALL_KINDS` array and named schemas list in `id.test.ts`.
+- When mocking modules in bun tests, spread the real module's exports to avoid breaking other test files (`mock.module` leaks process-wide in bun).
+- Run `bun run test` from the repo root to verify all tests pass before considering a change complete.
+- See [docs/testing.md](docs/testing.md) for the full testing guide.

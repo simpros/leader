@@ -26,6 +26,16 @@ export class SettingsPage {
   readonly pendingInvitationsHeading: Locator;
   readonly invitationsTable: Locator;
 
+  // SMTP Configuration
+  readonly smtpHeading: Locator;
+  readonly smtpHostInput: Locator;
+  readonly smtpPortInput: Locator;
+  readonly smtpUserInput: Locator;
+  readonly smtpPassInput: Locator;
+  readonly smtpEmailFromInput: Locator;
+  readonly smtpSaveButton: Locator;
+  readonly smtpTestButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -62,6 +72,23 @@ export class SettingsPage {
       name: /pending invitations/i,
     });
     this.invitationsTable = page.locator("table");
+
+    // SMTP Configuration
+    this.smtpHeading = page.getByRole("heading", {
+      name: /smtp configuration/i,
+    });
+    this.smtpHostInput = page.locator("#smtp-host");
+    this.smtpPortInput = page.locator("#smtp-port");
+    this.smtpUserInput = page.locator("#smtp-user");
+    this.smtpPassInput = page.locator("#smtp-pass");
+    this.smtpEmailFromInput = page.locator("#email-from");
+    this.smtpSaveButton = page
+      .locator("form")
+      .filter({ has: page.locator("#smtp-host") })
+      .getByRole("button", { name: /^save$/i });
+    this.smtpTestButton = page.getByRole("button", {
+      name: /test connection/i,
+    });
   }
 
   async gotoProfile() {

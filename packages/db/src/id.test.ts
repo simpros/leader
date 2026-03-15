@@ -13,6 +13,7 @@ import {
   initiativeIdSchema,
   initiativeLeadIdSchema,
   initiativeConversationIdSchema,
+  organizationSmtpConfigIdSchema,
 } from "./id";
 import type { IdKind } from "./id";
 
@@ -25,6 +26,7 @@ const ALL_KINDS: IdKind[] = [
   "initiative",
   "initiativeLead",
   "initiativeConversation",
+  "organizationSmtpConfig",
 ];
 
 describe("generateId", () => {
@@ -101,6 +103,7 @@ describe("named ID schemas", () => {
     { schema: initiativeIdSchema, kind: "initiative" as const },
     { schema: initiativeLeadIdSchema, kind: "initiativeLead" as const },
     { schema: initiativeConversationIdSchema, kind: "initiativeConversation" as const },
+    { schema: organizationSmtpConfigIdSchema, kind: "organizationSmtpConfig" as const },
   ];
 
   it.each(schemas)(
