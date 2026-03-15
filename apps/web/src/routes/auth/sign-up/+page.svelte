@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { authClient } from "@leader/auth/client";
   import { Button, Card, Input } from "@leader/ui";
   import * as v from "valibot";
@@ -76,7 +77,7 @@
 
     isSubmitting = false;
 
-    await goto("/");
+    await goto(resolve("/"));
   };
 </script>
 
@@ -190,7 +191,7 @@
     <p class="text-center text-sm text-neutral-500">
       Already have an account?
       <a
-        href="/auth/login"
+        href={resolve("/auth/login")}
         class="text-primary-600 hover:text-primary-700 font-semibold"
       >
         Sign in

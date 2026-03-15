@@ -3,8 +3,10 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 // Use same secret as crypto.test.ts — the key is cached process-wide
 process.env.BETTER_AUTH_SECRET = "test-secret-for-smtp";
 
-const mockSendMail = mock(() => Promise.resolve());
-const mockCreateTransport = mock(() => ({
+const mockSendMail = mock((_opts: Record<string, unknown>) =>
+  Promise.resolve()
+);
+const mockCreateTransport = mock((_opts: Record<string, unknown>) => ({
   sendMail: mockSendMail,
 }));
 
@@ -40,7 +42,9 @@ const mockSmtpConfig = {
 
 let mockDbResult: typeof mockSmtpConfig | undefined = mockSmtpConfig;
 
-const mockLimit = mock(() => Promise.resolve(mockDbResult ? [mockDbResult] : []));
+const mockLimit = mock(() =>
+  Promise.resolve(mockDbResult ? [mockDbResult] : [])
+);
 const mockWhere = mock(() => ({ limit: mockLimit }));
 const mockFrom = mock(() => ({ where: mockWhere }));
 const mockSelect = mock(() => ({ from: mockFrom }));
@@ -96,17 +100,19 @@ describe("sendOrgEmail", () => {
   it("decrypts the SMTP password back to plaintext", async () => {
     await sendOrgEmail("org-1", "to@example.com", "Test", "body");
 
-    const transportConfig = mockCreateTransport.mock.calls[0]![0] as Record<
-      string,
-      unknown
-    >;
+    const transportConfig = mockCreateTransport.mock
+      .calls[0]![0] as Record<string, unknown>;
     expect((transportConfig.auth as Record<string, unknown>).pass).toBe(
       SMTP_PASSWORD
     );
   });
 
   it("uses secure: true when port is 465", async () => {
-    mockDbResult = { ...mockSmtpConfig, smtpPort: 465, smtpPass: encrypt(SMTP_PASSWORD) };
+    mockDbResult = {
+      ...mockSmtpConfig,
+      smtpPort: 465,
+      smtpPass: encrypt(SMTP_PASSWORD),
+    };
 
     await sendOrgEmail("org-1", "to@example.com", "Test", "body");
 
@@ -121,9 +127,7 @@ describe("sendOrgEmail", () => {
 
     await expect(
       sendOrgEmail("org-unknown", "to@example.com", "Test", "body")
-    ).rejects.toThrow(
-      "SMTP is not configured for this organisation"
-    );
+    ).rejects.toThrow("SMTP is not configured for this organisation");
     expect(mockCreateTransport).not.toHaveBeenCalled();
     expect(mockSendMail).not.toHaveBeenCalled();
   });

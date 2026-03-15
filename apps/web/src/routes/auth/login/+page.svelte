@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { authClient } from "@leader/auth/client";
   import { Button, Card, Input } from "@leader/ui";
@@ -35,8 +36,8 @@
       return;
     }
 
-    // eslint-disable-next-line svelte/no-navigation-without-resolve
-    await goto(redirectTo);
+    // redirectTo is a dynamic query-string value, not a known route literal
+    await goto(resolve(redirectTo as "/"));
   };
 </script>
 
@@ -104,7 +105,7 @@
       <p class="text-center text-sm text-neutral-500">
         Don't have an account?
         <a
-          href="/auth/sign-up"
+          href={resolve("/auth/sign-up")}
           class="text-primary-600 hover:text-primary-700 font-semibold"
         >
           Create one

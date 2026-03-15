@@ -156,14 +156,6 @@ export async function createTestUsers(): Promise<void> {
 
   // Add admin as owner of the second org (so org switcher appears)
   if (adminUser) {
-    const [existingMembership] = await db
-      .select({ id: schema.member.id })
-      .from(schema.member)
-      .where(
-        eq(schema.member.userId, adminUser.id),
-      )
-      .limit(2);
-
     // Only add if admin doesn't already have a membership in the second org
     const adminMemberships = await db
       .select({ id: schema.member.id, organizationId: schema.member.organizationId })

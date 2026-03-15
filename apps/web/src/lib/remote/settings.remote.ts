@@ -1,9 +1,8 @@
 import { command, getRequestEvent, query } from "$app/server";
 import { db, eq, schema } from "@leader/db";
 import { error } from "@sveltejs/kit";
-import * as v from "valibot";
 import { organizationSmtpConfigSchema } from "$lib/schemas/settings";
-import { encrypt, decrypt } from "$lib/server/crypto";
+import { encrypt } from "$lib/server/crypto";
 import { addRequestLogContext } from "$lib/server/request-logging";
 import nodemailer from "nodemailer";
 
