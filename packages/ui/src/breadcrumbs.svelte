@@ -1,0 +1,39 @@
+<script lang="ts">
+  export type BreadcrumbItem = {
+    label: string;
+    href?: string;
+  };
+
+  let { items, class: className = "" }: {
+    items: BreadcrumbItem[];
+    class?: string;
+  } = $props();
+</script>
+
+<nav
+  aria-label="Breadcrumb"
+  class={[
+    "flex items-center gap-2 font-mono text-xs tracking-wider text-neutral-500 uppercase",
+    className,
+  ]}
+>
+  <span class="bg-primary-500 inline-block h-3 w-3"></span>
+  {#each items as item, i (item.href ?? item.label)}
+    {@const isLast = i === items.length - 1}
+    {#if i > 0}
+      <span aria-hidden="true" class="text-neutral-400">//</span>
+    {/if}
+    {#if isLast || !item.href}
+      <span
+        class="font-bold text-neutral-900"
+        aria-current={isLast ? "page" : undefined}
+      >
+        {item.label}
+      </span>
+    {:else}
+      <a href={item.href} class="hover:text-primary-600 transition-colors">
+        {item.label}
+      </a>
+    {/if}
+  {/each}
+</nav>
