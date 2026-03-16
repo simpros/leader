@@ -117,6 +117,7 @@ describe("Project page", () => {
     session: {
       activeOrganizationId: "org-1",
     },
+    organizations: [{ id: "org-1", name: "Test Org", slug: "test-org" }] as { id: string; name: string; slug: string }[],
   } as const;
 
   beforeEach(() => {

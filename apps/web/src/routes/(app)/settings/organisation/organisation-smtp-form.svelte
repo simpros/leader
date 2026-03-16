@@ -34,6 +34,14 @@
         _smtpPass: "",
         emailFrom: config.emailFrom,
       });
+    } else {
+      saveSmtpConfig.fields.set({
+        smtpHost: "",
+        smtpPort: 587,
+        smtpUser: "",
+        _smtpPass: "",
+        emailFrom: "",
+      });
     }
   };
 

@@ -33,23 +33,12 @@ test.describe("Org Switcher", () => {
 
       // When user has >1 org, the org switcher renders a dropdown trigger (button)
       // The trigger text is the active org name
-      // Use getByRole to find the dropdown trigger button in the header
       const header = page.getByRole("banner");
       const orgDropdown = header
         .getByRole("button")
         .filter({ hasText: /Leader|Acme/i });
 
-      // If the dropdown trigger is visible, the multi-org switcher is active
-      const isMultiOrg = await orgDropdown
-        .isVisible({ timeout: 5_000 })
-        .catch(() => false);
-
-      test.skip(
-        !isMultiOrg,
-        "Org switcher dropdown not visible — admin may only have 1 org in this environment",
-      );
-
-      await expect(orgDropdown).toBeVisible();
+      await expect(orgDropdown).toBeVisible({ timeout: 5_000 });
     });
 
     test("should open dropdown and show both organisations", async ({
@@ -63,15 +52,7 @@ test.describe("Org Switcher", () => {
         .getByRole("button")
         .filter({ hasText: /Leader|Acme/i });
 
-      const isMultiOrg = await orgDropdown
-        .isVisible({ timeout: 5_000 })
-        .catch(() => false);
-
-      test.skip(
-        !isMultiOrg,
-        "Org switcher dropdown not visible — admin may only have 1 org in this environment",
-      );
-
+      await expect(orgDropdown).toBeVisible({ timeout: 5_000 });
       await orgDropdown.click();
 
       // Both orgs should appear in the dropdown menu
@@ -92,15 +73,7 @@ test.describe("Org Switcher", () => {
         .getByRole("button")
         .filter({ hasText: /Leader|Acme/i });
 
-      const isMultiOrg = await orgDropdown
-        .isVisible({ timeout: 5_000 })
-        .catch(() => false);
-
-      test.skip(
-        !isMultiOrg,
-        "Org switcher dropdown not visible — admin may only have 1 org in this environment",
-      );
-
+      await expect(orgDropdown).toBeVisible({ timeout: 5_000 });
       await orgDropdown.click();
 
       // Click the second org
@@ -113,6 +86,17 @@ test.describe("Org Switcher", () => {
         header.getByRole("button").filter({
           hasText: new RegExp(TEST_SECOND_ORG.name, "i"),
         }),
+      ).toBeVisible({ timeout: 10_000 });
+
+      // Switch back to original org so later tests using the same admin
+      // session are not affected (setActive mutates the server-side session)
+      const switchedDropdown = header
+        .getByRole("button")
+        .filter({ hasText: new RegExp(TEST_SECOND_ORG.name, "i") });
+      await switchedDropdown.click();
+      await page.getByRole("menuitem", { name: "Leader" }).click();
+      await expect(
+        header.getByRole("button").filter({ hasText: /Leader/i }),
       ).toBeVisible({ timeout: 10_000 });
     });
 
