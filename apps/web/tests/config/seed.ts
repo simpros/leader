@@ -99,17 +99,24 @@ export async function createTestUsers(): Promise<void> {
 
   console.log("✅ Organization & memberships ready");
 
-  // Look up admin user for subsequent operations
+  // Look up users for subsequent operations
   const [adminUser] = await db
     .select({ id: schema.user.id })
     .from(schema.user)
     .where(eq(schema.user.email, TEST_ADMIN.email))
     .limit(1);
 
+  const [testUser] = await db
+    .select({ id: schema.user.id })
+    .from(schema.user)
+    .where(eq(schema.user.email, TEST_USER.email))
+    .limit(1);
+
   // Create a test project for E2E testing
+  // Owned by the regular test user because the projects page filters by userId
   console.log("📦 Ensuring test project...");
 
-  if (adminUser) {
+  if (testUser) {
     const [existingProject] = await db
       .select({ id: schema.project.id })
       .from(schema.project)
@@ -121,7 +128,7 @@ export async function createTestUsers(): Promise<void> {
         organizationId: orgId,
         name: "Test Project",
         description: "Seeded project for E2E tests",
-        userId: adminUser.id,
+        userId: testUser.id,
       });
     }
   }
