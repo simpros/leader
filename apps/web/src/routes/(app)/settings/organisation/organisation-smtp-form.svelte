@@ -9,14 +9,23 @@
   } from "$lib/remote/settings.remote";
   import type { StatusMessage } from "./organisation.svelte.js";
 
-  let testing = $state(false);
-  let loaded = $state(false);
-  let message = $state<StatusMessage | null>(null);
-
+  const configQuery = getSmtpConfig();
+  const loaded = $derived(configQuery.ready);
+  const testing = $derived(testSmtpConnection.pending > 0);
   const isSubmitting = $derived(saveSmtpConfig.pending > 0);
 
+  let lastActionOutcome = $state<StatusMessage | null>(null);
+
+  const message = $derived.by((): StatusMessage | null => {
+    if (isSubmitting || testing) return null;
+    if (lastActionOutcome) return lastActionOutcome;
+    if (saveSmtpConfig.result?.success)
+      return { type: "success", text: "SMTP configuration saved" };
+    return null;
+  });
+
   const loadConfig = async () => {
-    const config = await getSmtpConfig();
+    const config = await configQuery;
     if (config) {
       saveSmtpConfig.fields.set({
         smtpHost: config.smtpHost,
@@ -26,18 +35,16 @@
         emailFrom: config.emailFrom,
       });
     }
-    loaded = true;
   };
 
   loadConfig();
 
   const smtpForm = saveSmtpConfig.enhance(async ({ submit }) => {
-    message = null;
+    lastActionOutcome = null;
     try {
       await submit();
-      message = { type: "success", text: "SMTP configuration saved" };
     } catch (err) {
-      message = {
+      lastActionOutcome = {
         type: "error",
         text:
           err instanceof Error
@@ -48,7 +55,7 @@
   });
 
   const handleTest = async () => {
-    message = null;
+    lastActionOutcome = null;
 
     const values = saveSmtpConfig.fields.value();
     const result = v.safeParse(organizationSmtpConfigSchema, {
@@ -56,19 +63,21 @@
       smtpPort: Number(values.smtpPort),
     });
     if (!result.success) {
-      message = {
+      lastActionOutcome = {
         type: "error",
         text: result.issues[0]?.message ?? "Invalid input",
       };
       return;
     }
 
-    testing = true;
     try {
       await testSmtpConnection(result.output);
-      message = { type: "success", text: "SMTP connection successful" };
+      lastActionOutcome = {
+        type: "success",
+        text: "SMTP connection successful",
+      };
     } catch (err) {
-      message = {
+      lastActionOutcome = {
         type: "error",
         text:
           err instanceof Error
@@ -76,7 +85,6 @@
             : "SMTP connection test failed",
       };
     }
-    testing = false;
   };
 </script>
 
