@@ -9,55 +9,32 @@
   } from "$lib/remote/settings.remote";
   import type { StatusMessage } from "./organisation.svelte.js";
 
-  let smtpHost = $state("");
-  let smtpPort = $state(587);
-  let smtpUser = $state("");
-  let smtpPass = $state("");
-  let emailFrom = $state("");
-
-  let saving = $state(false);
   let testing = $state(false);
   let loaded = $state(false);
   let message = $state<StatusMessage | null>(null);
 
+  const isSubmitting = $derived(saveSmtpConfig.pending > 0);
+
   const loadConfig = async () => {
     const config = await getSmtpConfig();
     if (config) {
-      smtpHost = config.smtpHost;
-      smtpPort = config.smtpPort;
-      smtpUser = config.smtpUser;
-      emailFrom = config.emailFrom;
-      smtpPass = "";
+      saveSmtpConfig.fields.set({
+        smtpHost: config.smtpHost,
+        smtpPort: config.smtpPort,
+        smtpUser: config.smtpUser,
+        _smtpPass: "",
+        emailFrom: config.emailFrom,
+      });
     }
     loaded = true;
   };
 
   loadConfig();
 
-  const getFormValues = () => ({
-    smtpHost,
-    smtpPort,
-    smtpUser,
-    smtpPass,
-    emailFrom,
-  });
-
-  const handleSave = async (e: SubmitEvent) => {
-    e.preventDefault();
+  const smtpForm = saveSmtpConfig.enhance(async ({ submit }) => {
     message = null;
-
-    const result = v.safeParse(organizationSmtpConfigSchema, getFormValues());
-    if (!result.success) {
-      message = {
-        type: "error",
-        text: result.issues[0]?.message ?? "Invalid input",
-      };
-      return;
-    }
-
-    saving = true;
     try {
-      await saveSmtpConfig(result.output);
+      await submit();
       message = { type: "success", text: "SMTP configuration saved" };
     } catch (err) {
       message = {
@@ -68,13 +45,16 @@
             : "Failed to save SMTP configuration",
       };
     }
-    saving = false;
-  };
+  });
 
   const handleTest = async () => {
     message = null;
 
-    const result = v.safeParse(organizationSmtpConfigSchema, getFormValues());
+    const values = saveSmtpConfig.fields.value();
+    const result = v.safeParse(organizationSmtpConfigSchema, {
+      ...values,
+      smtpPort: Number(values.smtpPort),
+    });
     if (!result.success) {
       message = {
         type: "error",
@@ -111,7 +91,7 @@
     organisation.
   </p>
   {#if loaded}
-    <form class="flex flex-col gap-4" onsubmit={handleSave}>
+    <form class="flex flex-col gap-4" {...smtpForm}>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-1.5">
           <label
@@ -120,7 +100,7 @@
           >
           <Input
             id="smtp-host"
-            bind:value={smtpHost}
+            {...saveSmtpConfig.fields.smtpHost.as("text")}
             placeholder="smtp.example.com"
             required
           />
@@ -132,8 +112,7 @@
           >
           <Input
             id="smtp-port"
-            type="number"
-            bind:value={smtpPort}
+            {...saveSmtpConfig.fields.smtpPort.as("number")}
             min={1}
             max={65535}
             required
@@ -148,7 +127,7 @@
           >
           <Input
             id="smtp-user"
-            bind:value={smtpUser}
+            {...saveSmtpConfig.fields.smtpUser.as("text")}
             placeholder="user@example.com"
             required
           />
@@ -160,8 +139,7 @@
           >
           <Input
             id="smtp-pass"
-            type="password"
-            bind:value={smtpPass}
+            {...saveSmtpConfig.fields._smtpPass.as("password")}
             placeholder="Enter password"
             required
           />
@@ -174,8 +152,7 @@
         >
         <Input
           id="email-from"
-          type="email"
-          bind:value={emailFrom}
+          {...saveSmtpConfig.fields.emailFrom.as("email")}
           placeholder="noreply@example.com"
           required
         />
@@ -193,13 +170,13 @@
         </p>
       {/if}
       <div class="flex gap-3">
-        <Button type="submit" disabled={saving || testing}>
-          {saving ? "Saving…" : "Save"}
+        <Button type="submit" disabled={isSubmitting || testing}>
+          {isSubmitting ? "Saving…" : "Save"}
         </Button>
         <Button
           type="button"
           variant="ghost"
-          disabled={saving || testing}
+          disabled={isSubmitting || testing}
           onclick={handleTest}
         >
           {testing ? "Testing…" : "Test Connection"}

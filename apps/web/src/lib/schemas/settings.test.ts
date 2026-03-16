@@ -152,7 +152,7 @@ describe("organizationSmtpConfigSchema", () => {
     smtpHost: "smtp.example.com",
     smtpPort: 587,
     smtpUser: "user@example.com",
-    smtpPass: "secret-password",
+    _smtpPass: "secret-password",
     emailFrom: "noreply@example.com",
   };
 
@@ -209,8 +209,8 @@ describe("organizationSmtpConfigSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects empty smtpPass", () => {
-    const result = v.safeParse(organizationSmtpConfigSchema, { ...validInput, smtpPass: "" });
+  it("rejects empty _smtpPass", () => {
+    const result = v.safeParse(organizationSmtpConfigSchema, { ...validInput, _smtpPass: "" });
     expect(result.success).toBe(false);
   });
 

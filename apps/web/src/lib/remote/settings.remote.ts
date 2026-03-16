@@ -1,22 +1,16 @@
-import { command, getRequestEvent, query } from "$app/server";
+import { command, form, getRequestEvent, query } from "$app/server";
 import { db, eq, schema } from "@leader/db";
 import { error } from "@sveltejs/kit";
 import { organizationSmtpConfigSchema } from "$lib/schemas/settings";
 import { encrypt } from "$lib/server/crypto";
+import { ensureOrgAdmin } from "$lib/server/ensure-org-admin";
 import { addRequestLogContext } from "$lib/server/request-logging";
 import nodemailer from "nodemailer";
-
-const ensureOrgAdmin = (locals: App.Locals) => {
-  const userId = locals.user?.id;
-  const organizationId = locals.session?.activeOrganizationId;
-  if (!userId || !organizationId) throw error(401, "Unauthorized");
-  return { userId, organizationId };
-};
 
 export const getSmtpConfig = query(async () => {
   addRequestLogContext({ action: "getSmtpConfig" });
   const { locals } = getRequestEvent();
-  const { organizationId } = ensureOrgAdmin(locals);
+  const { organizationId } = await ensureOrgAdmin(locals);
 
   const [config] = await db
     .select({
@@ -35,14 +29,14 @@ export const getSmtpConfig = query(async () => {
   return config ?? null;
 });
 
-export const saveSmtpConfig = command(
+export const saveSmtpConfig = form(
   organizationSmtpConfigSchema,
   async (input) => {
     addRequestLogContext({ action: "saveSmtpConfig" });
     const { locals } = getRequestEvent();
-    const { organizationId } = ensureOrgAdmin(locals);
+    const { organizationId } = await ensureOrgAdmin(locals);
 
-    const encryptedPass = encrypt(input.smtpPass);
+    const encryptedPass = encrypt(input._smtpPass);
     const now = new Date();
 
     const [existing] = await db
@@ -87,15 +81,15 @@ export const testSmtpConnection = command(
   async (input) => {
     addRequestLogContext({ action: "testSmtpConnection" });
     const { locals } = getRequestEvent();
-    ensureOrgAdmin(locals);
+    await ensureOrgAdmin(locals);
 
     const transporter = nodemailer.createTransport({
       host: input.smtpHost,
       port: input.smtpPort,
       secure: input.smtpPort === 465,
       auth:
-        input.smtpUser && input.smtpPass
-          ? { user: input.smtpUser, pass: input.smtpPass }
+        input.smtpUser && input._smtpPass
+          ? { user: input.smtpUser, pass: input._smtpPass }
           : undefined,
     });
 

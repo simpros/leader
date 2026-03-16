@@ -70,7 +70,7 @@ export const organizationSmtpConfigSchema = v.object({
     v.minLength(1, "SMTP user is required"),
     v.maxLength(255, "User is too long")
   ),
-  smtpPass: v.pipe(
+  _smtpPass: v.pipe(
     v.string(),
     v.minLength(1, "SMTP password is required")
   ),
