@@ -1,11 +1,11 @@
-export { default as Badge } from "./Badge.svelte";
-export { default as Breadcrumbs } from "./Breadcrumbs.svelte";
-export type { BreadcrumbItem } from "./Breadcrumbs.svelte";
-export { default as Button } from "./Button.svelte";
-export { default as Card } from "./Card.svelte";
+export { default as Badge } from "./badge.svelte";
+export { default as Breadcrumbs } from "./breadcrumbs.svelte";
+export type { BreadcrumbItem } from "./breadcrumbs.svelte";
+export { default as Button } from "./button.svelte";
+export { default as Card } from "./card.svelte";
 export { default as Dialog } from "./dialog.svelte";
-export { default as FloatingPill } from "./FloatingPill.svelte";
-export { default as Input } from "./Input.svelte";
+export { default as FloatingPill } from "./floating-pill.svelte";
+export { default as Input } from "./input.svelte";
 export { default as Menu } from "./menu.svelte";
 export type { MenuItem } from "./menu.svelte";
 export { default as Tabs } from "./tabs.svelte";

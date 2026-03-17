@@ -53,3 +53,29 @@ export const inviteMemberSchema = v.object({
   email: v.pipe(v.string(), v.email("Please enter a valid email address")),
   role: v.picklist(["member", "admin"], "Please select a role"),
 });
+
+export const organizationSmtpConfigSchema = v.object({
+  smtpHost: v.pipe(
+    v.string(),
+    v.minLength(1, "SMTP host is required"),
+    v.maxLength(253, "Host is too long")
+  ),
+  smtpPort: v.pipe(
+    v.number(),
+    v.minValue(1, "Port must be between 1 and 65535"),
+    v.maxValue(65535, "Port must be between 1 and 65535")
+  ),
+  smtpUser: v.pipe(
+    v.string(),
+    v.minLength(1, "SMTP user is required"),
+    v.maxLength(255, "User is too long")
+  ),
+  _smtpPass: v.pipe(
+    v.string(),
+    v.minLength(1, "SMTP password is required")
+  ),
+  emailFrom: v.pipe(
+    v.string(),
+    v.email("Please enter a valid from email address")
+  ),
+});

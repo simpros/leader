@@ -14,14 +14,14 @@
     class: restClass = "",
     children,
     ...restProps
-  } = $props<{
+  }: {
     variant?: BadgeVariant;
     tone?: BadgeTone;
     size?: BadgeSize;
     className?: string;
     class?: string;
     children?: Snippet;
-  }>();
+  } = $props();
 
   const badge = tv({
     base: "inline-flex items-center gap-1 font-mono font-bold uppercase tracking-wider ring-1 ring-inset",

@@ -3,6 +3,7 @@
     updateInitiativeEmail,
     getInitiativeCapabilities,
   } from "$lib/remote/initiatives.remote.js";
+  import { untrack } from "svelte";
   import { Button, Input } from "@leader/ui";
   import EmailTemplateEditor from "$lib/components/email-template-editor.svelte";
   import AiDraftPanel from "$lib/components/initiative-ai-draft-panel.svelte";
@@ -33,8 +34,8 @@
   }: InitiativeEditFormProps = $props();
 
   let errorMessage = $state("");
-  let htmlBody = $state(initiative.htmlBody);
-  let subject = $state(initiative.subject);
+  let htmlBody = $state(untrack(() => initiative.htmlBody));
+  let subject = $state(untrack(() => initiative.subject));
 
   const capabilities = $derived(await getInitiativeCapabilities());
   const isSubmitting = $derived(updateInitiativeEmail.pending > 0);

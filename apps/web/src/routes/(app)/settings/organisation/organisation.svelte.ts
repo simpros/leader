@@ -28,8 +28,8 @@ export type StatusMessage = {
 };
 
 export function createOrganizationState() {
-	let members = $state<OrgMember[]>([]);
-	let invitations = $state<OrgInvitation[]>([]);
+	let members = $state.raw<OrgMember[]>([]);
+	let invitations = $state.raw<OrgInvitation[]>([]);
 	let loading = $state(true);
 
 	const pendingInvitations = $derived(

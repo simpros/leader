@@ -99,6 +99,7 @@ const { default: ProjectPage } = await import("./+page.svelte");
 describe("Project page", () => {
   const mockData = {
     locale: "en-US",
+    allowSignUp: false,
     user: {
       id: "user-1",
       createdAt: new Date(),
@@ -116,6 +117,7 @@ describe("Project page", () => {
     session: {
       activeOrganizationId: "org-1",
     },
+    organizations: [{ id: "org-1", name: "Test Org", slug: "test-org" }] as { id: string; name: string; slug: string }[],
   } as const;
 
   beforeEach(() => {

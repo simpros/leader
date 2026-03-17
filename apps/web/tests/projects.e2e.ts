@@ -27,11 +27,7 @@ test.describe("Projects", () => {
     await projectsPage.goto();
 
     const firstProject = projectsPage.projectCards.first();
-    // Only run this test when projects exist (seeded data includes a project)
-    const visible = await firstProject
-      .isVisible({ timeout: 5_000 })
-      .catch(() => false);
-    test.skip(!visible, "No projects seeded — skipping detail navigation");
+    await expect(firstProject).toBeVisible({ timeout: 5_000 });
 
     await firstProject.click();
     await expect(projectsPage.page).toHaveURL(/\/projects\/.+/);

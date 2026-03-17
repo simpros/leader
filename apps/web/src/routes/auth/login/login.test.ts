@@ -16,6 +16,7 @@ mock.module("$app/paths", () => ({ resolve: mockResolve }));
 mock.module("$app/state", () => ({
 	page: {
 		url: new URL("http://localhost/auth/login"),
+		data: { allowSignUp: false },
 	},
 }));
 mock.module("@leader/auth/client", () => ({

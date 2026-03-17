@@ -15,7 +15,22 @@ import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
 import { getOtelSink } from "$lib/server/telemetry";
 import { randomUUIDv7 } from "bun";
 
+const ALLOW_SIGN_UP = process.env.ALLOW_SIGN_UP === "true";
+
 if (!building) {
+  if (ALLOW_SIGN_UP) {
+    const endpoint = process.env.DYNATRACE_OTLP_ENDPOINT;
+    const apiToken = process.env.DYNATRACE_API_TOKEN;
+    const telemetryDisabled = process.env.LEADER_TELEMETRY === "false";
+
+    if (!endpoint || !apiToken || telemetryDisabled) {
+      throw new Error(
+        "ALLOW_SIGN_UP=true requires OpenTelemetry tracing to be configured. " +
+          "Set DYNATRACE_OTLP_ENDPOINT and DYNATRACE_API_TOKEN, and ensure LEADER_TELEMETRY is not 'false'."
+      );
+    }
+  }
+
   const otelSink = getOtelSink();
   await configureLogging(
     otelSink ? { sinks: { otel: otelSink } } : undefined
@@ -140,6 +155,10 @@ const signUpGuardHandle: Handle = async ({ event, resolve }) => {
     event.url.pathname === SIGN_UP_PATH &&
     event.request.method === "POST"
   ) {
+    if (ALLOW_SIGN_UP) {
+      return resolve(event);
+    }
+
     const cloned = event.request.clone();
     const body = await cloned.json().catch(() => null);
     const email = (body as Record<string, unknown> | null)?.email;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { authClient } from "@leader/auth/client";
+  import { untrack } from "svelte";
   import { Button, Card, Input } from "@leader/ui";
   import * as v from "valibot";
   import { updateOrganisationSchema } from "$lib/schemas/settings";
@@ -11,8 +12,8 @@
 
   let { organization }: OrganisationDetailsFormProps = $props();
 
-  let orgName = $state(organization?.name ?? "");
-  let orgSlug = $state(organization?.slug ?? "");
+  let orgName = $state(untrack(() => organization?.name ?? ""));
+  let orgSlug = $state(untrack(() => organization?.slug ?? ""));
   let saving = $state(false);
   let message = $state<StatusMessage | null>(null);
 

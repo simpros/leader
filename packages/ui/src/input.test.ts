@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/svelte";
-import Input from "./Input.svelte";
+import Input from "./input.svelte";
 
 describe("Input", () => {
   it("renders an input element", () => {

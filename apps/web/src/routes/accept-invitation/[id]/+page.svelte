@@ -11,9 +11,10 @@
   let declining = $state(false);
   let errorMessage = $state<string | null>(null);
 
-  const { invitation, user } = data;
-  const isExpired = new Date(invitation.expiresAt) < new Date();
-  const isUsable = invitation.status === "pending" && !isExpired;
+  const invitation = $derived(data.invitation);
+  const user = $derived(data.user);
+  const isExpired = $derived(new Date(invitation.expiresAt) < new Date());
+  const isUsable = $derived(invitation.status === "pending" && !isExpired);
 
   const handleAccept = async () => {
     accepting = true;

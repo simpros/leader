@@ -64,7 +64,7 @@
       value={selectedProjectId}
     />
 
-    {#each selectedLeadsList as lead, leadIndex (leadIndex)}
+    {#each selectedLeadsList as lead, leadIndex (lead.placeId)}
       <input
         {...existingAddLeadsForm.fields.leads[leadIndex].placeId.as(
           "hidden",
@@ -85,7 +85,7 @@
         value={lead.address}
       />
 
-      {#each lead.types as type, typeIndex (typeIndex)}
+      {#each lead.types as type, typeIndex (type)}
         <input
           {...existingAddLeadsForm.fields.leads[leadIndex].types[
             typeIndex

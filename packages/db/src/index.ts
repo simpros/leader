@@ -14,6 +14,7 @@ export {
   initiativeIdSchema,
   initiativeLeadIdSchema,
   initiativeConversationIdSchema,
+  organizationSmtpConfigIdSchema,
 } from "./id";
 export type { IdKind, IdPrefix, Id } from "./id";
 

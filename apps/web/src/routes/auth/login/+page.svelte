@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { authClient } from "@leader/auth/client";
   import { Button, Card, Input } from "@leader/ui";
@@ -10,6 +11,7 @@
   let errorMessage = $state<string | null>(null);
 
   const redirectTo = page.url.searchParams.get("redirectTo") || "/";
+  const allowSignUp = $derived(page.data.allowSignUp);
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
@@ -34,8 +36,8 @@
       return;
     }
 
-    // eslint-disable-next-line svelte/no-navigation-without-resolve
-    await goto(redirectTo);
+    // redirectTo is a dynamic query-string value, not a known route literal
+    await goto(resolve(redirectTo as "/"));
   };
 </script>
 
@@ -98,5 +100,17 @@
         {isSubmitting ? "Signing in..." : "Sign in"}
       </Button>
     </form>
+
+    {#if allowSignUp}
+      <p class="text-center text-sm text-neutral-500">
+        Don't have an account?
+        <a
+          href={resolve("/auth/sign-up")}
+          class="text-primary-600 hover:text-primary-700 font-semibold"
+        >
+          Create one
+        </a>
+      </p>
+    {/if}
   </Card>
 </main>

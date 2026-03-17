@@ -8,6 +8,7 @@ export const load: LayoutLoad = async ({ data }) => {
     session: data.session
       ? { activeOrganizationId: data.session.activeOrganizationId }
       : null,
+    organizations: data.organizations,
     locale: browser ? navigator.language : (data.requestLocale ?? "en-US"),
   };
 };

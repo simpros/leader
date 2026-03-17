@@ -20,7 +20,7 @@ import {
   sendInitiativeTestEmailInputSchema,
   updateInitiativeEmailInputSchema,
 } from "$lib/schemas";
-import { sendEmail } from "$lib/server/email";
+import { sendOrgEmail } from "$lib/server/email";
 import {
   CORE_LEAD_VARIABLES,
   customFieldToken,
@@ -368,7 +368,7 @@ export const sendInitiativeTestEmail = form(
         throw error(400, "Could not determine recipient email");
       }
 
-      await sendEmail(recipientEmail, resolvedSubject, resolvedHtmlBody);
+      await sendOrgEmail(organizationId, recipientEmail, resolvedSubject, resolvedHtmlBody);
 
       return {
         sentTo: recipientEmail,
@@ -454,7 +454,8 @@ export const sendInitiative = form(
 
         if (hasEmail) {
           try {
-            await sendEmail(
+            await sendOrgEmail(
+              organizationId,
               lead.email!,
               resolvedSubject,
               resolvedHtmlBody
@@ -604,7 +605,7 @@ export const retryInitiativeLead = form(
       const now = new Date();
 
       try {
-        await sendEmail(lead.email, resolvedSubject, resolvedHtmlBody);
+        await sendOrgEmail(organizationId, lead.email, resolvedSubject, resolvedHtmlBody);
       } catch (err) {
         addRequestLogContext({
           email_send_error: err instanceof Error ? err.message : String(err),
