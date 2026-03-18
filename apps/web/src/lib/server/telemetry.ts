@@ -2,6 +2,7 @@ import { getOpenTelemetrySink } from "@logtape/otel";
 import type { OpenTelemetrySink } from "@logtape/otel";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-proto";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
+import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
   BatchLogRecordProcessor,
@@ -51,7 +52,11 @@ export function configureTelemetry(): void {
     headers,
   });
 
-  sdk = new NodeSDK({ resource, traceExporter });
+  sdk = new NodeSDK({
+    resource,
+    traceExporter,
+    instrumentations: [new HttpInstrumentation()],
+  });
   sdk.start();
 
   // ── Logs ──────────────────────────────────────────────────────────────
