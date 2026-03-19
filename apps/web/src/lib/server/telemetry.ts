@@ -1,5 +1,7 @@
 import { getOpenTelemetrySink } from "@logtape/otel";
 import type { OpenTelemetrySink } from "@logtape/otel";
+import { SpanKind, trace } from "@opentelemetry/api";
+import type { Span as ApiSpan } from "@opentelemetry/api";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-proto";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
@@ -9,10 +11,57 @@ import {
   LoggerProvider,
 } from "@opentelemetry/sdk-logs";
 import { NodeSDK } from "@opentelemetry/sdk-node";
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import type { ReadableSpan, SpanProcessor } from "@opentelemetry/sdk-trace-node";
 
 let sdk: NodeSDK | null = null;
 let loggerProvider: LoggerProvider | null = null;
 let otelSink: OpenTelemetrySink | null = null;
+
+// ── SvelteKit root-span promotion ───────────────────────────────────
+// SvelteKit's built-in tracing creates `sveltekit.handle.root` as
+// SpanKind.INTERNAL.  Dynatrace (and most APM backends) require a
+// SpanKind.SERVER entry-point span to detect and link services.
+//
+// This processor intercepts root spans on start and overwrites their
+// kind to SERVER.  The handle hook (`tracingHandle`) later enriches
+// the same span with HTTP semantic-convention attributes.
+
+const rootSpansByTrace = new Map<string, ApiSpan>();
+
+const svelteKitServerSpanProcessor: SpanProcessor = {
+  onStart(span) {
+    const name = (span as unknown as ReadableSpan).name;
+    if (name === "sveltekit.handle.root") {
+      // `kind` is declared `readonly` in TS but is a plain JS property.
+      Object.defineProperty(span, "kind", {
+        value: SpanKind.SERVER,
+        writable: true,
+        configurable: true,
+      });
+      rootSpansByTrace.set(span.spanContext().traceId, span);
+    }
+  },
+  onEnd(span) {
+    if (span.name === "sveltekit.handle.root") {
+      rootSpansByTrace.delete(span.spanContext().traceId);
+    }
+  },
+  async shutdown() {
+    rootSpansByTrace.clear();
+  },
+  async forceFlush() {},
+};
+
+/**
+ * Return the promoted root SERVER span for the current trace, or
+ * `undefined` when telemetry is disabled or the span is unavailable.
+ */
+export function getRootServerSpan(): ApiSpan | undefined {
+  const active = trace.getActiveSpan();
+  if (!active) return undefined;
+  return rootSpansByTrace.get(active.spanContext().traceId);
+}
 
 /**
  * Initialise OpenTelemetry for traces and logs.
@@ -54,7 +103,10 @@ export function configureTelemetry(): void {
 
   sdk = new NodeSDK({
     resource,
-    traceExporter,
+    spanProcessors: [
+      svelteKitServerSpanProcessor,
+      new BatchSpanProcessor(traceExporter),
+    ],
     instrumentations: [new HttpInstrumentation()],
   });
   sdk.start();
