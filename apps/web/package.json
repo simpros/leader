@@ -1,7 +1,7 @@
 {
   "name": "@leader/web",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
@@ -25,6 +25,7 @@
     "@leader/ui": "workspace:*",
     "@logtape/otel": "^2.0.4",
     "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/instrumentation-http": "^0.213.0",
     "@opentelemetry/exporter-logs-otlp-proto": "^0.213.0",
     "@opentelemetry/exporter-trace-otlp-proto": "^0.213.0",
     "@opentelemetry/resources": "^2.6.0",
