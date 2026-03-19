@@ -13,6 +13,7 @@ import { and, db, eq, runMigrations, schema, withRLS } from "@leader/db";
 import { configureLogging, getLogger } from "@leader/logging";
 import { ensureInitialUserWithOrganization } from "$lib/server/bootstrap";
 import { getOtelSink } from "$lib/server/telemetry";
+import { tracingHandle } from "$lib/server/tracing-handle";
 import { randomUUIDv7 } from "bun";
 
 const ALLOW_SIGN_UP = process.env.ALLOW_SIGN_UP === "true";
@@ -253,6 +254,7 @@ const wideEventHandle: Handle = async ({ event, resolve }) => {
 };
 
 export const handle = sequence(
+  tracingHandle,
   wideEventHandle,
   requestLocaleHandle,
   sessionHandle,
