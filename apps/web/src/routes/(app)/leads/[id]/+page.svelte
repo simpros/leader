@@ -28,7 +28,7 @@
   const deleteForm = deleteLead.enhance(async ({ submit }) => {
     deleteError = null;
     try {
-      await submit();
+      await submit().updates();
       await goto(resolve("/leads"));
     } catch (err) {
       console.error("Failed to delete lead:", err);

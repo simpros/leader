@@ -72,6 +72,43 @@
   </header>
 
   <main class="relative">
-    {@render children()}
+    <svelte:boundary>
+      {@render children()}
+
+      {#snippet pending()}
+        <div class="leader-page">
+          <div class="flex items-center justify-center py-24">
+            <p
+              class="font-mono text-xs font-bold tracking-wider text-neutral-400 uppercase"
+            >
+              Loading…
+            </p>
+          </div>
+        </div>
+      {/snippet}
+
+      {#snippet failed(error, reset)}
+        <div class="leader-page">
+          <div
+            class="mx-auto max-w-sm space-y-4 py-24 text-center"
+          >
+            <p
+              class="font-mono text-xs font-bold tracking-wider text-red-600 uppercase"
+            >
+              Something went wrong
+            </p>
+            <p class="font-mono text-xs text-neutral-500">
+              {error instanceof Error ? error.message : "An unexpected error occurred"}
+            </p>
+            <button
+              onclick={reset}
+              class="bg-primary-500 px-4 py-2 font-mono text-xs font-bold tracking-wider text-white uppercase transition-colors hover:bg-primary-600"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      {/snippet}
+    </svelte:boundary>
   </main>
 </div>
