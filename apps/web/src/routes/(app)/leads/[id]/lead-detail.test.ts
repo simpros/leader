@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from "bun:test";
+import { describe, it, expect, mock, beforeEach, spyOn } from "bun:test";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import {
   createFormMock,
@@ -72,7 +72,11 @@ describe("Lead detail page", () => {
     mockGetLeadData.mockClear();
     mockGoto.mockClear();
     mockResolve.mockClear();
-    mockGetLeadData.mockImplementation(() => Promise.resolve(mockLeadData));
+    mockDeleteLead.mockClear();
+    mockGetLeadData.mockImplementation(() =>
+      Promise.resolve(mockLeadData)
+    );
+    mockDeleteLead.mockImplementation(() => Promise.resolve({ ok: true }));
     mockResolve.mockImplementation((path: string) => path);
   });
 
@@ -80,7 +84,7 @@ describe("Lead detail page", () => {
     render(LeadDetailPage, { params: { id: "lead-1" } });
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Acme Corp" }),
+        screen.getByRole("heading", { name: "Acme Corp" })
       ).toBeTruthy();
     });
   });
@@ -107,75 +111,78 @@ describe("Lead detail page", () => {
   });
 
   describe("delete lead", () => {
-    it("uses submit().updates() to prevent auto-invalidation", async () => {
+    it("shows confirmation when Delete is clicked", async () => {
       render(LeadDetailPage, { params: { id: "lead-1" } });
 
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Acme Corp" })).toBeTruthy();
+        expect(screen.getByText("Delete")).toBeTruthy();
       });
 
-      // The component calls deleteLead.enhance(callback) during script execution.
-      // Our mock captures this callback in _enhanceCallback.
-      const enhanceCallback = (mockDeleteLead as any)._enhanceCallback;
-      expect(enhanceCallback).not.toBeNull();
+      screen.getByText("Delete").click();
 
-      // Create a mock submit that returns a Promise with .updates() method
-      const mockUpdates = mock(() => Promise.resolve({ ok: true }));
-      const mockSubmit = mock(() => {
-        const p = Promise.resolve({ ok: true });
-        (p as any).updates = mockUpdates;
-        return p;
+      await waitFor(() => {
+        expect(screen.getByText("Confirm Delete")).toBeTruthy();
+        expect(
+          screen.getByText("Delete this lead from all projects?")
+        ).toBeTruthy();
       });
-
-      await enhanceCallback({ submit: mockSubmit });
-
-      // submit() must be called
-      expect(mockSubmit).toHaveBeenCalledTimes(1);
-      // .updates() must be called on the submit result (single-flight mutation)
-      // This prevents SvelteKit from auto-invalidating getLeadData for the deleted lead
-      expect(mockUpdates).toHaveBeenCalledTimes(1);
     });
 
     it("navigates to /leads after successful delete", async () => {
       render(LeadDetailPage, { params: { id: "lead-1" } });
 
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Acme Corp" })).toBeTruthy();
+        expect(screen.getByText("Delete")).toBeTruthy();
       });
 
-      const enhanceCallback = (mockDeleteLead as any)._enhanceCallback;
+      screen.getByText("Delete").click();
 
-      const mockUpdates = mock(() => Promise.resolve({ ok: true }));
-      const mockSubmit = mock(() => {
-        const p = Promise.resolve({ ok: true });
-        (p as any).updates = mockUpdates;
-        return p;
+      await waitFor(() => {
+        expect(screen.getByText("Confirm Delete")).toBeTruthy();
       });
 
-      await enhanceCallback({ submit: mockSubmit });
+      const confirmButton = screen.getByText("Confirm Delete");
+      const form = confirmButton.closest("form")!;
+      form.dispatchEvent(new Event("submit", { bubbles: true }));
 
-      expect(mockGoto).toHaveBeenCalledTimes(1);
-      expect(mockGoto).toHaveBeenCalledWith("/leads");
+      await waitFor(() => {
+        expect(mockGoto).toHaveBeenCalledTimes(1);
+        expect(mockGoto).toHaveBeenCalledWith("/leads");
+      });
     });
 
     it("shows error message when delete fails", async () => {
+      const consoleSpy = spyOn(console, "error").mockImplementation(
+        () => {}
+      );
+      mockDeleteLead.mockImplementation(() =>
+        Promise.reject(new Error("Server error"))
+      );
+
       render(LeadDetailPage, { params: { id: "lead-1" } });
 
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Acme Corp" })).toBeTruthy();
+        expect(screen.getByText("Delete")).toBeTruthy();
       });
 
-      const enhanceCallback = (mockDeleteLead as any)._enhanceCallback;
+      screen.getByText("Delete").click();
 
-      const mockSubmit = mock(() => {
-        const p = Promise.reject(new Error("Server error"));
-        (p as any).updates = () => p;
-        return p;
+      await waitFor(() => {
+        expect(screen.getByText("Confirm Delete")).toBeTruthy();
       });
 
-      await enhanceCallback({ submit: mockSubmit });
+      const confirmButton = screen.getByText("Confirm Delete");
+      const form = confirmButton.closest("form")!;
+      form.dispatchEvent(new Event("submit", { bubbles: true }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("Failed to delete lead. Please try again.")
+        ).toBeTruthy();
+      });
 
       expect(mockGoto).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
   });
 });
