@@ -14,22 +14,22 @@ export function createFormMock(returnValue: unknown = { error: null }) {
         if (prop === "set") return () => {};
         return {
           as: () => ({ name: "field", value: "" }),
+          issues: () => null,
         };
       },
     },
   );
 
-  const enhanceFn = () => ({
-    action: "?/action",
-    method: "POST",
-  });
-
   const addFormApi = (target: (...args: unknown[]) => unknown) =>
     Object.assign(target, {
       for: () => addFormApi(mock(() => Promise.resolve(returnValue))),
       pending: 0,
-      enhance: enhanceFn,
+      enhance: (cb?: (...args: unknown[]) => unknown) => {
+        if (cb) (target as any)._enhanceCallback = cb;
+        return { action: "?/action", method: "POST" };
+      },
       fields: fieldProxy,
+      _enhanceCallback: null as ((...args: unknown[]) => unknown) | null,
     });
 
   return addFormApi(fn);
