@@ -4,27 +4,48 @@
   "dependencyDashboard": true,
   "rangeStrategy": "auto",
   "separateMajorMinor": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/ci\\.yml$/"],
+      "matchStrings": [
+        "bun-version:\\s*[\"']?(?<currentValue>[^\"'\\s]+)[\"']?",
+        "bun-v(?<currentValue>[^\"'\\s]+)"
+      ],
+      "depNameTemplate": "bun",
+      "packageNameTemplate": "bun",
+      "datasourceTemplate": "npm"
+    }
+  ],
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 4am on monday"]
   },
   "packageRules": [
     {
+      "description": "Group Bun runtime updates across package metadata, CI, and Docker",
+      "matchPackageNames": ["bun", "@types/bun", "oven/bun"],
+      "groupName": "bun runtime"
+    },
+    {
       "description": "Group non-major Bun workspace dependency updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchPackageNames": ["!bun", "!@types/bun"],
       "groupName": "bun workspace dependencies"
     },
     {
       "description": "Group GitHub Actions updates",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchPackageNames": ["!bun"],
       "groupName": "github actions"
     },
     {
       "description": "Group Docker image updates",
       "matchManagers": ["dockerfile", "docker-compose"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchPackageNames": ["!oven/bun"],
       "groupName": "docker images"
     }
   ]
