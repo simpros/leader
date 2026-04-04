@@ -26,7 +26,7 @@
     },
     "apps/web": {
       "name": "@leader/web",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "devDependencies": {
         "@leader/auth": "workspace:*",
         "@leader/db": "workspace:*",
