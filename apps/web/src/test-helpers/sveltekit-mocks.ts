@@ -14,21 +14,34 @@ export function createFormMock(returnValue: unknown = { error: null }) {
         if (prop === "set") return () => {};
         return {
           as: () => ({ name: "field", value: "" }),
+          issues: () => null,
         };
       },
-    },
+    }
   );
 
-  const enhanceFn = () => ({
-    action: "?/action",
-    method: "POST",
-  });
-
-  const addFormApi = (target: (...args: unknown[]) => unknown) =>
+  const addFormApi = <T extends (...args: unknown[]) => unknown>(
+    target: T
+  ) =>
     Object.assign(target, {
       for: () => addFormApi(mock(() => Promise.resolve(returnValue))),
       pending: 0,
-      enhance: enhanceFn,
+      enhance: (cb?: (...args: unknown[]) => unknown) => ({
+        action: "?/action",
+        method: "POST",
+        onsubmit: async (e: Event) => {
+          e.preventDefault();
+          if (cb) {
+            const submit = () => {
+              const result = target() as Promise<unknown>;
+              return Object.assign(result, {
+                updates: () => result,
+              });
+            };
+            await cb({ submit });
+          }
+        },
+      }),
       fields: fieldProxy,
     });
 
@@ -45,7 +58,9 @@ export function createQueryMock(returnValue: unknown = []) {
 /**
  * Creates a mock for SvelteKit remote `command()` functions.
  */
-export function createCommandMock(returnValue: unknown = { success: true }) {
+export function createCommandMock(
+  returnValue: unknown = { success: true }
+) {
   return mock(() => Promise.resolve(returnValue));
 }
 

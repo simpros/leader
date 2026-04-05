@@ -50,6 +50,43 @@ describe("Button", () => {
   it("passes extra attributes to the button", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render(Button, { "aria-label": "Test" } as any);
-    expect(screen.getByRole("button").getAttribute("aria-label")).toBe("Test");
+    expect(screen.getByRole("button").getAttribute("aria-label")).toBe(
+      "Test"
+    );
+  });
+
+  describe("loading prop", () => {
+    it("renders a spinner when loading=true", () => {
+      render(Button, { loading: true });
+      const btn = screen.getByRole("button");
+      expect(btn.querySelector(".animate-spin")).toBeTruthy();
+    });
+
+    it("renders children alongside the spinner when loading=true", () => {
+      render(Button, { loading: true, children: textSnippet("Find") });
+      expect(screen.getByText("Find")).toBeTruthy();
+      const btn = screen.getByRole("button");
+      expect(btn.querySelector(".animate-spin")).toBeTruthy();
+    });
+
+    it("disables the button when loading=true", () => {
+      render(Button, { loading: true });
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(
+        true
+      );
+    });
+
+    it("does not render a spinner when loading=false", () => {
+      render(Button, { loading: false });
+      const btn = screen.getByRole("button");
+      expect(btn.querySelector(".animate-spin")).toBeNull();
+    });
+
+    it("disables the button when both loading=true and disabled=true", () => {
+      render(Button, { loading: true, disabled: true });
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(
+        true
+      );
+    });
   });
 });
