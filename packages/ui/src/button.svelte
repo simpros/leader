@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes } from "svelte/elements";
+  import { slide } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
   import { tv } from "tailwind-variants";
 
   type ButtonVariant = "solid" | "outline" | "ghost";
@@ -11,6 +13,7 @@
     variant?: ButtonVariant;
     color?: ButtonColor;
     size?: ButtonSize;
+    loading?: boolean;
     className?: string;
     class?: string;
     children?: Snippet;
@@ -20,6 +23,7 @@
     variant = "solid",
     color = "primary",
     size = "md",
+    loading = false,
     disabled = false,
     type = "button",
     className = "",
@@ -131,10 +135,26 @@
 </script>
 
 <button
-  class={[button({ variant, color, size }), className, restClass]}
-  {disabled}
+  class={[
+    button({ variant, color, size }),
+    "overflow-hidden",
+    className,
+    restClass,
+  ]}
+  disabled={disabled || loading}
   {type}
   {...restProps}
 >
+  {#if loading}
+    <span
+      aria-hidden="true"
+      transition:slide={{ axis: "x", duration: 200, easing: cubicOut }}
+      class="mr-3 inline-flex shrink-0 items-center"
+    >
+      <span
+        class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent"
+      ></span>
+    </span>
+  {/if}
   {@render children?.()}
 </button>

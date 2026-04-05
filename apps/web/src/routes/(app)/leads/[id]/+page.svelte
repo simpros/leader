@@ -13,6 +13,7 @@
     createProjectCustomField,
     deleteLead,
     getLeadData,
+    getLeads,
     updateLeadCore,
     upsertLeadCustomFieldValue,
   } from "$lib/remote/leads.remote.js";
@@ -28,7 +29,7 @@
   const deleteForm = deleteLead.enhance(async ({ submit }) => {
     deleteError = null;
     try {
-      await submit().updates();
+      await submit().updates(getLeads());
       await goto(resolve("/leads"));
     } catch (err) {
       console.error("Failed to delete lead:", err);

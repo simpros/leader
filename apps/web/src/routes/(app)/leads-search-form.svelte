@@ -142,9 +142,9 @@
     <Button
       class="h-10 self-start transition-all active:scale-[0.98]"
       type="submit"
-      disabled={isLoading}
+      loading={isLoading}
     >
-      {isLoading ? "Searching…" : "Find"}
+      Find
     </Button>
   </div>
 
