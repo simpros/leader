@@ -16,8 +16,18 @@
   let { projectId, linkedLeadPlaceIds = [] }: LeadManualCreateFormProps =
     $props();
 
-  const projects = $derived(await getProjects());
-  const leads = $derived(await getLeads());
+  // The dialog is closed by default, so use the query resources directly
+  // instead of top-level async deriveds that would trigger await_waterfall.
+  const projectsQuery = getProjects();
+  const leadsQuery = getLeads();
+  const projects = $derived(
+    (projectsQuery.current ?? []) as NonNullable<
+      typeof projectsQuery.current
+    >
+  );
+  const leads = $derived(
+    (leadsQuery.current ?? []) as NonNullable<typeof leadsQuery.current>
+  );
   const existingAddLeadForm = addLeadsToProject.for(
     "project-existing-lead"
   );

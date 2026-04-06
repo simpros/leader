@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/svelte";
 import {
   createFormMock,
   createQueryMock,
+  createQueryResult,
   createCommandMock,
   mockSvelteKitModules,
 } from "../../../../test-helpers/sveltekit-mocks";
@@ -117,15 +118,19 @@ describe("Project page", () => {
     session: {
       activeOrganizationId: "org-1",
     },
-    organizations: [{ id: "org-1", name: "Test Org", slug: "test-org" }] as { id: string; name: string; slug: string }[],
+    organizations: [
+      { id: "org-1", name: "Test Org", slug: "test-org" },
+    ] as { id: string; name: string; slug: string }[],
   } as const;
 
   beforeEach(() => {
     mockGetProjectData.mockClear();
     mockGetProjectInitiatives.mockClear();
-    mockGetProjectData.mockImplementation(() => Promise.resolve(mockProject));
+    mockGetProjectData.mockImplementation(() =>
+      createQueryResult(mockProject)
+    );
     mockGetProjectInitiatives.mockImplementation(() =>
-      Promise.resolve(mockInitiatives),
+      createQueryResult(mockInitiatives)
     );
   });
 
@@ -136,7 +141,7 @@ describe("Project page", () => {
     });
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Test Project" }),
+        screen.getByRole("heading", { name: "Test Project" })
       ).toBeTruthy();
     });
   });
@@ -147,9 +152,7 @@ describe("Project page", () => {
       data: mockData,
     });
     await waitFor(() => {
-      expect(
-        screen.getByText("A test project description"),
-      ).toBeTruthy();
+      expect(screen.getByText("A test project description")).toBeTruthy();
     });
   });
 

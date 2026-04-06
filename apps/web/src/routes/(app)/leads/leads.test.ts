@@ -1,8 +1,10 @@
 import { describe, it, expect, mock, beforeEach } from "bun:test";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import {
+  createCommandMock,
   createFormMock,
   createQueryMock,
+  createQueryResult,
 } from "../../../test-helpers/sveltekit-mocks";
 
 const mockLeads = [
@@ -63,6 +65,7 @@ mock.module("$app/paths", () => ({
 mock.module("$app/server", () => ({
   query: (fn: (...args: unknown[]) => unknown) => fn,
   form: () => createFormMock(),
+  command: () => createCommandMock(),
   getRequestEvent: () => ({}),
 }));
 
@@ -71,7 +74,7 @@ const { default: LeadsPage } = await import("./+page.svelte");
 describe("Leads page", () => {
   beforeEach(() => {
     mockGetLeads.mockClear();
-    mockGetLeads.mockImplementation(() => Promise.resolve(mockLeads));
+    mockGetLeads.mockImplementation(() => createQueryResult(mockLeads));
   });
 
   it("renders the page heading", async () => {
@@ -84,9 +87,7 @@ describe("Leads page", () => {
   it("renders the page description", async () => {
     render(LeadsPage);
     await waitFor(() => {
-      expect(
-        screen.getByText(/Review every saved lead/),
-      ).toBeTruthy();
+      expect(screen.getByText(/Review every saved lead/)).toBeTruthy();
     });
   });
 
@@ -117,9 +118,7 @@ describe("Leads page", () => {
   it("shows no contact message for leads without details", async () => {
     render(LeadsPage);
     await waitFor(() => {
-      expect(
-        screen.getByText("No contact details yet"),
-      ).toBeTruthy();
+      expect(screen.getByText("No contact details yet")).toBeTruthy();
     });
   });
 
@@ -132,13 +131,13 @@ describe("Leads page", () => {
   });
 
   it("shows empty state when there are no leads", async () => {
-    mockGetLeads.mockImplementation(() => Promise.resolve([]));
+    mockGetLeads.mockImplementation(() =>
+      createQueryResult<typeof mockLeads>([])
+    );
     render(LeadsPage);
     await waitFor(() => {
       expect(screen.getByText("No leads yet")).toBeTruthy();
-      expect(
-        screen.getByText(/Discover leads and add them/),
-      ).toBeTruthy();
+      expect(screen.getByText(/Discover leads and add them/)).toBeTruthy();
     });
   });
 });

@@ -1,5 +1,14 @@
 import { mock } from "bun:test";
 
+export type QueryResult<T> = Promise<T> & {
+  current: T;
+  loading: boolean;
+  error: null;
+  refresh: () => Promise<T>;
+  set: (value: T) => Promise<T>;
+  withOverride: (override: (value: T) => T) => QueryResult<T>;
+};
+
 /**
  * Creates a mock for SvelteKit remote `form()` functions.
  * Simulates .for(), .enhance(), .pending, and .fields properties.
@@ -51,8 +60,25 @@ export function createFormMock(returnValue: unknown = { error: null }) {
 /**
  * Creates a mock for SvelteKit remote `query()` functions.
  */
-export function createQueryMock(returnValue: unknown = []) {
-  return mock(() => Promise.resolve(returnValue));
+export function createQueryMock<T>(returnValue: T) {
+  return mock((): QueryResult<T> => createQueryResult(returnValue));
+}
+
+export function createQueryResult<T>(returnValue: T) {
+  const result = Promise.resolve(returnValue) as QueryResult<T>;
+
+  result.current = returnValue;
+  result.loading = false;
+  result.error = null;
+  result.refresh = () => Promise.resolve(result.current);
+  result.set = (value: T) => {
+    result.current = value;
+    return Promise.resolve(value);
+  };
+  result.withOverride = (override: (value: T) => T) =>
+    createQueryResult(override(result.current));
+
+  return result;
 }
 
 /**
