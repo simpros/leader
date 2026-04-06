@@ -85,11 +85,7 @@
     subjectName={createInitiativeEmail.fields.subject.as("text").name}
     {projectId}
     {leads}
-    placeholder="<p>Hello,</p>
-
-<p>Your message here...</p>
-
-<p>Best regards</p>"
+    placeholder="Start writing your email..."
   />
 
   {#if errorMessage}
