@@ -52,5 +52,14 @@
     "valibot": "^1.2.0",
     "vite": "^8.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@tiptap/core": "^3.22.2",
+    "@tiptap/extension-link": "^3.22.2",
+    "@tiptap/extension-placeholder": "^3.22.2",
+    "@tiptap/extension-text-align": "^3.22.2",
+    "@tiptap/extension-underline": "^3.22.2",
+    "@tiptap/pm": "^3.22.2",
+    "@tiptap/starter-kit": "^3.22.2",
+    "@tiptap/suggestion": "^3.22.2"
+  }
 }
