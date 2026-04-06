@@ -3,6 +3,7 @@
   import type { Selection } from "@tiptap/pm/state";
   import type { TemplateVariable } from "../template-variables.js";
   import type { EmailButtonAttrs } from "./tiptap-email-button.js";
+  import { groupItemsByGroup } from "./group-items-by-group.js";
 
   // Side-effect imports to register TipTap command types
   import "@tiptap/starter-kit";
@@ -62,24 +63,7 @@
     };
   });
 
-  // Group variables by group
-  type GroupEntry = {
-    group: string;
-    items: TemplateVariable[];
-  };
-
-  const grouped = $derived.by((): GroupEntry[] => {
-    const groupMap = new Map<string, TemplateVariable[]>();
-    for (const v of variables) {
-      const group = groupMap.get(v.group) ?? [];
-      group.push(v);
-      groupMap.set(v.group, group);
-    }
-    return [...groupMap.entries()].map(([group, items]) => ({
-      group,
-      items,
-    }));
-  });
+  const grouped = $derived.by(() => groupItemsByGroup(variables));
 
   function rememberSelection() {
     preservedSelection = editor.state.selection;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { SuggestionItem } from "./tiptap-variable-suggestion.js";
+  import { groupItemsByGroup } from "./group-items-by-group.js";
 
   type EditorVariablePopupProps = {
     items: SuggestionItem[];
@@ -27,28 +28,23 @@
     };
   });
 
-  // Group items while preserving flat indices for keyboard navigation
-  type GroupEntry = {
+  type IndexedSuggestionItem = {
     group: string;
-    items: Array<{ item: SuggestionItem; flatIndex: number }>;
+    item: SuggestionItem;
+    flatIndex: number;
   };
 
-  const grouped = $derived.by((): GroupEntry[] => {
-    const groupMap = new Map<
-      string,
-      Array<{ item: SuggestionItem; flatIndex: number }>
-    >();
-    let index = 0;
-    for (const item of items) {
-      const group = groupMap.get(item.group) ?? [];
-      group.push({ item, flatIndex: index++ });
-      groupMap.set(item.group, group);
-    }
-    return [...groupMap.entries()].map(([group, groupItems]) => ({
-      group,
-      items: groupItems,
-    }));
-  });
+  const grouped = $derived.by(() =>
+    groupItemsByGroup(
+      items.map(
+        (item, flatIndex): IndexedSuggestionItem => ({
+          group: item.group,
+          item,
+          flatIndex,
+        })
+      )
+    )
+  );
 
   export function handleKeyDown(event: KeyboardEvent): boolean {
     if (event.key === "ArrowDown") {
