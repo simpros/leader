@@ -23,7 +23,7 @@
   "devDependencies": {
     "@leader/eslint-config": "workspace:*",
     "@types/bun": "1.3.12",
-    "drizzle-kit": "1.0.0-beta.12-a5629fb",
+    "drizzle-kit": "1.0.0-beta.9-e89174b",
     "drizzle-orm": "1.0.0-beta.12-a5629fb",
     "drizzle-valibot": "^0.4.2",
     "typescript": "^5.9.3"
