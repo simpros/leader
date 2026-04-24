@@ -24,7 +24,7 @@
   "peerDependencies": {
     "@leader/typescript-config": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "7.0.0",
-    "svelte": "5.53.6"
+    "svelte": "5.55.5"
   },
   "devDependencies": {
     "@leader/eslint-config": "workspace:*",
