@@ -1,7 +1,6 @@
 import { describe, it, expect, mock, beforeEach, spyOn } from "bun:test";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import {
-  createCommandMock,
   createFormMock,
   createQueryMock,
   createQueryResult,
@@ -59,13 +58,6 @@ mock.module("$app/navigation", () => ({
 
 mock.module("$app/paths", () => ({
   resolve: mockResolve,
-}));
-
-mock.module("$app/server", () => ({
-  query: (fn: (...args: unknown[]) => unknown) => fn,
-  form: () => createFormMock(),
-  command: () => createCommandMock(),
-  getRequestEvent: () => ({}),
 }));
 
 const { default: LeadDetailPage } = await import("./+page.svelte");

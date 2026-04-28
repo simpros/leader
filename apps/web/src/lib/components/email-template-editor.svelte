@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Debounced } from "runed";
+  import { Debounced, watch } from "runed";
   import { untrack } from "svelte";
   import { Editor } from "@tiptap/core";
   import StarterKit from "@tiptap/starter-kit";
@@ -101,19 +101,11 @@
     return findMissingPlaceholders(combined, leads, customFields);
   });
 
-  $effect(() => {
-    if (!selectedPreviewLeadId) {
-      return;
+  watch(() => previewableLeads, (leads) => {
+    if (selectedPreviewLeadId && !leads.some((lead) => lead.id === selectedPreviewLeadId)) {
+      selectedPreviewLeadId = "";
     }
-
-    if (
-      previewableLeads.some((lead) => lead.id === selectedPreviewLeadId)
-    ) {
-      return;
-    }
-
-    selectedPreviewLeadId = "";
-  });
+  }, { lazy: true });
 
   function updateTemplateVariablePreview() {
     if (!editorElement) return;
@@ -222,29 +214,28 @@
   });
 
   // Sync external value changes into the editor (e.g. AI-generated drafts)
-  $effect(() => {
-    // Track value changes
-    void value;
-
+  // lazy: true — editor is null on init and isUpdatingFromEditor guards internal updates
+  watch(() => value, (nextRaw) => {
     if (!editor || isUpdatingFromEditor) return;
 
     const currentHtml = normalizeTemplateEditorHtml(
       postprocessTemplateHtml(editor.getHTML())
     );
-    const nextValue = normalizeTemplateEditorHtml(value);
+    const nextValue = normalizeTemplateEditorHtml(nextRaw);
 
     if (currentHtml !== nextValue) {
-      editor.commands.setContent(preprocessTemplateHtml(nextValue), {
-        emitUpdate: false,
+      // setContent triggers onTransaction (editorVersion++); without untrack this
+      // effect would re-run on every transaction — infinite loop.
+      untrack(() => {
+        editor!.commands.setContent(preprocessTemplateHtml(nextValue), {
+          emitUpdate: false,
+        });
+        editorVersion++;
       });
-      editorVersion++;
     }
-  });
+  }, { lazy: true });
 
-  $effect(() => {
-    void selectedPreviewLead;
-    void editorVersion;
-
+  watch([() => selectedPreviewLead, () => editorVersion], () => {
     updateTemplateVariablePreview();
   });
 

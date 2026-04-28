@@ -30,6 +30,7 @@ import { normalize, parseTypes } from "$lib/server/utils/data";
 const GOOGLE_PLACES_API_KEY = env.GOOGLE_PLACES_API_KEY ?? "";
 const OPENROUTER_API_KEY = env.OPENROUTER_API_KEY ?? "";
 const OPENROUTER_MODEL = env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
+const OPENROUTER_BASE_URL = env.OPENROUTER_BASE_URL ?? "https://openrouter.ai";
 const BRAVE_API_KEY = env.BRAVE_API_KEY ?? "";
 
 type LeadFormResponse = LeadResponse & { message?: string };
@@ -133,6 +134,7 @@ export const discoverLeads = form(
           location,
           apiKey: OPENROUTER_API_KEY,
           model: OPENROUTER_MODEL,
+          baseUrl: OPENROUTER_BASE_URL,
         });
 
     if (!searchTerm && OPENROUTER_API_KEY) {

@@ -9,6 +9,7 @@ type OpenRouterOptions = {
   location: string;
   apiKey?: string | null;
   model?: string | null;
+  baseUrl?: string | null;
 };
 
 export const getContentText = (content: unknown): string | null => {
@@ -40,6 +41,7 @@ export const getOpenRouterAudienceQueries = async ({
   location,
   apiKey,
   model,
+  baseUrl,
 }: OpenRouterOptions) => {
   if (!apiKey) {
     return buildFallbackQueries(projectDescription, "");
@@ -57,8 +59,9 @@ export const getOpenRouterAudienceQueries = async ({
     .filter(Boolean)
     .join("\n");
 
+  const apiBase = (baseUrl ?? "https://openrouter.ai").replace(/\/$/, "");
   const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
+    `${apiBase}/api/v1/chat/completions`,
     {
       method: "POST",
       headers: {

@@ -87,6 +87,13 @@ describe("postprocessTemplateHtml", () => {
     const result = postprocessTemplateHtml(input);
     expect(result).toBe("{{custom.industry}}");
   });
+
+  it("handles preview attributes regardless of attribute order", () => {
+    const input =
+      '<span data-variable-id="lead.name" data-preview-text="Acme Corp" data-preview-state="resolved" data-type="template-variable" class="tiptap-template-variable" contenteditable="false">Acme Corp</span>';
+    const result = postprocessTemplateHtml(input);
+    expect(result).toBe("{{lead.name}}");
+  });
 });
 
 describe("round-trip: preprocess -> postprocess", () => {

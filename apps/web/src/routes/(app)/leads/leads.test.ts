@@ -1,7 +1,6 @@
 import { describe, it, expect, mock, beforeEach } from "bun:test";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import {
-  createCommandMock,
   createFormMock,
   createQueryMock,
   createQueryResult,
@@ -34,7 +33,7 @@ const mockGetLeads = createQueryMock(mockLeads);
 const mockGetProjects = createQueryMock([]);
 const mockResolve = mock((path: string) => path);
 
-mock.module("$lib/remote/leads.remote", () => ({
+const mockedLeadsRemote = {
   getLeads: mockGetLeads,
   createManualLead: createFormMock(),
   getDiscoveryCapabilities: createQueryMock({ hasOpenRouter: false }),
@@ -44,9 +43,9 @@ mock.module("$lib/remote/leads.remote", () => ({
   createProjectCustomField: createFormMock(),
   upsertLeadCustomFieldValue: createFormMock(),
   deleteLead: createFormMock(),
-}));
+};
 
-mock.module("$lib/remote/projects.remote", () => ({
+const mockedProjectsRemote = {
   getProjects: mockGetProjects,
   addLeadsToProject: createFormMock(),
   createProject: createFormMock(),
@@ -56,17 +55,16 @@ mock.module("$lib/remote/projects.remote", () => ({
   createProjectWithLeads: createFormMock(),
   getProjectCustomFields: createQueryMock([]),
   getProjectData: createQueryMock(null),
-}));
+};
+
+mock.module("$lib/remote/leads.remote", () => mockedLeadsRemote);
+mock.module("$lib/remote/leads.remote.js", () => mockedLeadsRemote);
+
+mock.module("$lib/remote/projects.remote", () => mockedProjectsRemote);
+mock.module("$lib/remote/projects.remote.js", () => mockedProjectsRemote);
 
 mock.module("$app/paths", () => ({
   resolve: mockResolve,
-}));
-
-mock.module("$app/server", () => ({
-  query: (fn: (...args: unknown[]) => unknown) => fn,
-  form: () => createFormMock(),
-  command: () => createCommandMock(),
-  getRequestEvent: () => ({}),
 }));
 
 const { default: LeadsPage } = await import("./+page.svelte");

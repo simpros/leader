@@ -67,16 +67,11 @@
     />
   </label>
 
-  <div class="flex items-center justify-between">
-    <span class="text-sm font-semibold text-neutral-700">
-      Email Template
-    </span>
-    <AiDraftPanel
-      {projectId}
-      aiGenerationAvailable={capabilities.aiGenerationAvailable}
-      onGenerated={handleAiGenerated}
-    />
-  </div>
+  <AiDraftPanel
+    {projectId}
+    aiGenerationAvailable={capabilities.aiGenerationAvailable}
+    onGenerated={handleAiGenerated}
+  />
 
   <EmailTemplateEditor
     bind:value={htmlBody}

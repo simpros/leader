@@ -20,13 +20,6 @@ mock.module("$lib/remote/initiatives.remote.js", () => ({
   getInitiative: createQueryMock(null),
 }));
 
-mock.module("$app/server", () => ({
-  query: (fn: (...args: unknown[]) => unknown) => fn,
-  form: () => createFormMock(),
-  command: () => createCommandMock(),
-  getRequestEvent: () => ({}),
-}));
-
 const { default: InitiativeTestEmailForm } =
   await import("./initiative-test-email-form.svelte");
 

@@ -114,12 +114,5 @@ export function mockSvelteKitModules() {
     },
   }));
 
-  mock.module("$app/server", () => ({
-    query: (fn: (...args: unknown[]) => unknown) => fn,
-    form: () => createFormMock(),
-    command: () => createCommandMock(),
-    getRequestEvent: () => ({}),
-  }));
-
   return { mockGoto, mockInvalidate, mockResolve };
 }
