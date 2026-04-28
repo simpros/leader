@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { watch } from "runed";
   import type { SuggestionItem } from "./tiptap-variable-suggestion.js";
   import { groupItemsByGroup } from "./group-items-by-group.js";
 
@@ -12,11 +13,7 @@
 
   let selectedIndex = $state(0);
 
-  // Reset selection when items change
-  $effect(() => {
-    void items.length;
-    selectedIndex = 0;
-  });
+  watch(() => items, () => { selectedIndex = 0; }, { lazy: true });
 
   const position = $derived.by(() => {
     if (!clientRect) return { top: 0, left: 0 };

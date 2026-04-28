@@ -3,6 +3,7 @@
   import {
     deleteProject,
     getProjectData,
+    getProjects,
     unlinkLeadFromProject,
     updateProject,
   } from "$lib/remote/projects.remote.js";
@@ -11,10 +12,11 @@
     retryInitiativeLead,
     sendInitiative,
   } from "$lib/remote/initiatives.remote.js";
-  import { goto, invalidate } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { createSearchParamsSchema, useSearchParams } from "runed/kit";
+  import { toast } from "svelte-sonner";
   import { fade, fly } from "svelte/transition";
   import LeadManualCreateForm from "../../lead-manual-create-form.svelte";
 
@@ -63,7 +65,8 @@
   const deleteForm = deleteProject.enhance(async ({ submit }) => {
     deleteError = null;
     try {
-      await submit();
+      await submit().updates(getProjects());
+      toast.success("Project deleted");
       await goto(resolve("/projects"));
     } catch (err) {
       console.error("Failed to delete project:", err);
@@ -76,7 +79,6 @@
     try {
       await submit();
       isEditing = false;
-      await invalidate("app:project");
     } catch (err) {
       console.error("Failed to update project:", err);
       updateError = "Failed to update project. Please try again.";
@@ -96,7 +98,6 @@
     try {
       await submit();
       confirmingInitiativeId = null;
-      await invalidate("app:project");
     } catch (err) {
       console.error("Failed to send initiative:", err);
       sendError = "Failed to send initiative. Please try again.";
@@ -110,7 +111,6 @@
       try {
         await submit();
         retryingLeadId = null;
-        await invalidate("app:project");
       } catch (err) {
         console.error("Failed to retry email:", err);
         retryError = "Failed to retry email. Please try again.";
@@ -125,7 +125,6 @@
       try {
         await submit();
         unlinkingLeadId = null;
-        await invalidate("app:project");
       } catch (err) {
         console.error("Failed to unlink lead:", err);
         unlinkError = "Failed to unlink lead. Please try again.";

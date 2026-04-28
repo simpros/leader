@@ -94,7 +94,10 @@ export const createProject = form(
 export const updateProject = form(
   updateProjectInputSchema,
   async (input) => {
-    addRequestLogContext({ action: "updateProject", project_id: input.projectId });
+    addRequestLogContext({
+      action: "updateProject",
+      project_id: input.projectId,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -142,7 +145,10 @@ export const updateProject = form(
 export const deleteProject = form(
   deleteProjectInputSchema,
   async (input) => {
-    addRequestLogContext({ action: "deleteProject", project_id: input.projectId });
+    addRequestLogContext({
+      action: "deleteProject",
+      project_id: input.projectId,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -179,7 +185,11 @@ export const deleteProject = form(
 export const addLeadsToProject = form(
   addLeadsToProjectInputSchema,
   async (input) => {
-    addRequestLogContext({ action: "addLeadsToProject", project_id: input.projectId, lead_count: input.leads.length });
+    addRequestLogContext({
+      action: "addLeadsToProject",
+      project_id: input.projectId,
+      lead_count: input.leads.length,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -278,7 +288,11 @@ export const addLeadsToProject = form(
 export const unlinkLeadFromProject = form(
   unlinkLeadFromProjectInputSchema,
   async (input) => {
-    addRequestLogContext({ action: "unlinkLeadFromProject", project_id: input.projectId, lead_id: input.leadId });
+    addRequestLogContext({
+      action: "unlinkLeadFromProject",
+      project_id: input.projectId,
+      lead_id: input.leadId,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -332,7 +346,10 @@ export const unlinkLeadFromProject = form(
 export const createProjectWithLeads = form(
   createProjectWithLeadsInputSchema,
   async (input) => {
-    addRequestLogContext({ action: "createProjectWithLeads", lead_count: input.leads.length });
+    addRequestLogContext({
+      action: "createProjectWithLeads",
+      lead_count: input.leads.length,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -433,7 +450,10 @@ export const createProjectWithLeads = form(
 export const getProjectCustomFields = query(
   projectIdSchema,
   async (projectId) => {
-    addRequestLogContext({ action: "getProjectCustomFields", project_id: projectId });
+    addRequestLogContext({
+      action: "getProjectCustomFields",
+      project_id: projectId,
+    });
     const { locals } = getRequestEvent();
     const userId = locals.user?.id;
     const organizationId = locals.session?.activeOrganizationId;
@@ -466,7 +486,10 @@ export const getProjectCustomFields = query(
 );
 
 export const getProjectData = query(projectIdSchema, async (projectId) => {
-  addRequestLogContext({ action: "getProjectData", project_id: projectId });
+  addRequestLogContext({
+    action: "getProjectData",
+    project_id: projectId,
+  });
   const { locals } = getRequestEvent();
   const userId = locals.user?.id;
   const organizationId = locals.session?.activeOrganizationId;

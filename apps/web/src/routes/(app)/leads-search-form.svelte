@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { watch } from "runed";
   import { Badge, Button, Field, Input, Tabs } from "@leader/ui";
   import {
     discoverLeads,
@@ -31,20 +32,19 @@
 
   discoverLeads.fields.maxResults.set(20);
 
-  $effect(() => {
+  watch(() => canDescribe, (canDescribe) => {
     if (!canDescribe && inputMode === "project-description") {
       inputMode = "search-term";
     }
-  });
+  }, { lazy: true });
 
-  $effect(() => {
-    if (inputMode === "search-term") {
+  watch(() => inputMode, (mode) => {
+    if (mode === "search-term") {
       discoverLeads.fields.projectDescription.set("");
-      return;
+    } else {
+      discoverLeads.fields.searchTerm.set("");
     }
-
-    discoverLeads.fields.searchTerm.set("");
-  });
+  }, { lazy: true });
 </script>
 
 <form class="space-y-4" {...leadForm}>

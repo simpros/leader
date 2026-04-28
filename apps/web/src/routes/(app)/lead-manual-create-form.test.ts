@@ -18,19 +18,28 @@ mock.module("$app/server", () => ({
   getRequestEvent: () => ({}),
 }));
 
-const realProjectsRemote = await import("$lib/remote/projects.remote.js");
-const realLeadsRemote = await import("$lib/remote/leads.remote.js");
-
 const mockedProjectsRemote = {
-  ...realProjectsRemote,
   getProjects: mockGetProjects,
   addLeadsToProject: createFormMock(),
+  createProject: createFormMock(),
+  updateProject: createFormMock(),
+  deleteProject: createFormMock(),
+  unlinkLeadFromProject: createFormMock(),
+  createProjectWithLeads: createFormMock(),
+  getProjectCustomFields: createQueryMock([]),
+  getProjectData: createQueryMock(null),
 };
 
 const mockedLeadsRemote = {
-  ...realLeadsRemote,
   getLeads: mockGetLeads,
   createManualLead: createFormMock(),
+  getDiscoveryCapabilities: createQueryMock({ hasOpenRouter: false }),
+  discoverLeads: createFormMock(),
+  getLeadData: createQueryMock(null),
+  updateLeadCore: createFormMock(),
+  createProjectCustomField: createFormMock(),
+  upsertLeadCustomFieldValue: createFormMock(),
+  deleteLead: createFormMock(),
 };
 
 mock.module("$lib/remote/projects.remote", () => mockedProjectsRemote);

@@ -5,6 +5,8 @@ export type TemplateVariableOptions = {
   HTMLAttributes: Record<string, string>;
 };
 
+export type TemplateVariablePreviewState = "raw" | "resolved" | "missing";
+
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     templateVariable: {
@@ -48,6 +50,26 @@ export const TemplateVariable = Node.create<TemplateVariableOptions>({
           "data-variable-id": attributes.variableId as string,
         }),
       },
+      previewText: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-preview-text"),
+        renderHTML: (attributes) => {
+          const previewText = attributes.previewText as string | null;
+          return previewText ? { "data-preview-text": previewText } : {};
+        },
+      },
+      previewState: {
+        default: "raw",
+        parseHTML: (element) =>
+          (element.getAttribute(
+            "data-preview-state"
+          ) as TemplateVariablePreviewState | null) ?? "raw",
+        renderHTML: (attributes) => ({
+          "data-preview-state":
+            (attributes.previewState as TemplateVariablePreviewState | null) ??
+            "raw",
+        }),
+      },
     };
   },
 
@@ -61,6 +83,8 @@ export const TemplateVariable = Node.create<TemplateVariableOptions>({
 
   renderHTML({ node, HTMLAttributes }) {
     const variableId = node.attrs.variableId as string;
+    const previewText =
+      (node.attrs.previewText as string | null) ?? `{{${variableId}}}`;
 
     return [
       "span",
@@ -69,8 +93,9 @@ export const TemplateVariable = Node.create<TemplateVariableOptions>({
         "data-variable-id": variableId,
         class: "tiptap-template-variable",
         contenteditable: "false",
+        title: `{{${variableId}}}`,
       }),
-      `{{${variableId}}}`,
+      previewText,
     ];
   },
 
@@ -119,7 +144,7 @@ export function preprocessTemplateHtml(html: string): string {
  */
 export function postprocessTemplateHtml(html: string): string {
   return html.replace(
-    /<span[^>]*data-type="template-variable"[^>]*data-variable-id="([^"]*)"[^>]*>[^<]*<\/span>/g,
+    /<span(?=[^>]*\bdata-type="template-variable")(?=[^>]*\bdata-variable-id="([^"]*)")[^>]*>[^<]*<\/span>/g,
     (_match, variableId: string) => `{{${variableId}}}`
   );
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { watch } from "runed";
   import { createManualLead, getLeads } from "$lib/remote/leads.remote";
   import {
     addLeadsToProject,
@@ -55,20 +56,17 @@
   let mode = $state<"existing" | "new">("new");
   let selectedLeadId = $state("");
 
-  $effect(() => {
-    if (!projectId) return;
+  watch([() => projectId, () => availableLeads], ([pid, leads]) => {
+    if (!pid) return;
 
-    if (availableLeads.length === 0) {
+    if (leads.length === 0) {
       mode = "new";
       selectedLeadId = "";
       return;
     }
 
-    if (
-      !selectedLeadId ||
-      !availableLeads.some((lead) => lead.id === selectedLeadId)
-    ) {
-      selectedLeadId = availableLeads[0]?.id ?? "";
+    if (!selectedLeadId || !leads.some((lead) => lead.id === selectedLeadId)) {
+      selectedLeadId = leads[0]?.id ?? "";
     }
   });
 
