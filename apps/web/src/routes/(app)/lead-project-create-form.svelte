@@ -5,6 +5,7 @@
   import HiddenInput from "./hidden-input.svelte";
   import type { SvelteSet } from "svelte/reactivity";
   import { getTextFieldName } from "$lib/utils/form-helpers";
+  import { toast } from "svelte-sonner";
 
   type LeadProjectCreateFormProps = {
     selectedLeads: SvelteSet<Lead>;
@@ -31,6 +32,8 @@
 
       try {
         await submit();
+        const count = selectedLeads.size;
+        toast.success(`Project created with ${count} ${count === 1 ? "lead" : "leads"}`);
         onSuccess();
       } catch (error) {
         console.error(error);

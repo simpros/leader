@@ -1,4 +1,8 @@
 import { describe, it, expect, mock, beforeEach } from "bun:test";
+import {
+  createCommandMock,
+  createFormMock,
+} from "../../test-helpers/sveltekit-mocks";
 
 // Mock $app/server before importing the module under test
 const mockWideEvent: Record<string, unknown> = {};
@@ -7,6 +11,9 @@ const mockGetRequestEvent = mock(() => ({
 }));
 
 mock.module("$app/server", () => ({
+  query: (fn: (...args: unknown[]) => unknown) => fn,
+  form: () => createFormMock(),
+  command: () => createCommandMock(),
   getRequestEvent: mockGetRequestEvent,
 }));
 

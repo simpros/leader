@@ -1,8 +1,10 @@
 import { describe, it, expect, mock, beforeEach, spyOn } from "bun:test";
 import { render, screen, waitFor } from "@testing-library/svelte";
 import {
+  createCommandMock,
   createFormMock,
   createQueryMock,
+  createQueryResult,
 } from "../../../../test-helpers/sveltekit-mocks";
 
 const mockLeadData = {
@@ -62,6 +64,7 @@ mock.module("$app/paths", () => ({
 mock.module("$app/server", () => ({
   query: (fn: (...args: unknown[]) => unknown) => fn,
   form: () => createFormMock(),
+  command: () => createCommandMock(),
   getRequestEvent: () => ({}),
 }));
 
@@ -74,7 +77,7 @@ describe("Lead detail page", () => {
     mockResolve.mockClear();
     mockDeleteLead.mockClear();
     mockGetLeadData.mockImplementation(() =>
-      Promise.resolve(mockLeadData)
+      createQueryResult(mockLeadData)
     );
     mockDeleteLead.mockImplementation(() => Promise.resolve({ ok: true }));
     mockResolve.mockImplementation((path: string) => path);

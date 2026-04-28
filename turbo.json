@@ -11,6 +11,7 @@
         "GOOGLE_PLACES_API_KEY",
         "OPENROUTER_API_KEY",
         "OPENROUTER_MODEL",
+        "OPENROUTER_BASE_URL",
         "BRAVE_API_KEY",
         "SMTP_HOST",
         "SMTP_PORT",
