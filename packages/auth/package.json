@@ -1,7 +1,6 @@
 {
   "name": "@leader/auth",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "exports": {
     ".": "./src/auth.ts",
