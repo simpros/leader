@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { watch } from "runed";
   import { createManualLead, getLeads } from "$lib/remote/leads.remote";
   import {
     addLeadsToProject,
@@ -16,8 +17,18 @@
   let { projectId, linkedLeadPlaceIds = [] }: LeadManualCreateFormProps =
     $props();
 
-  const projects = $derived(await getProjects());
-  const leads = $derived(await getLeads());
+  // The dialog is closed by default, so use the query resources directly
+  // instead of top-level async deriveds that would trigger await_waterfall.
+  const projectsQuery = getProjects();
+  const leadsQuery = getLeads();
+  const projects = $derived(
+    (projectsQuery.current ?? []) as NonNullable<
+      typeof projectsQuery.current
+    >
+  );
+  const leads = $derived(
+    (leadsQuery.current ?? []) as NonNullable<typeof leadsQuery.current>
+  );
   const existingAddLeadForm = addLeadsToProject.for(
     "project-existing-lead"
   );
@@ -45,20 +56,17 @@
   let mode = $state<"existing" | "new">("new");
   let selectedLeadId = $state("");
 
-  $effect(() => {
-    if (!projectId) return;
+  watch([() => projectId, () => availableLeads], ([pid, leads]) => {
+    if (!pid) return;
 
-    if (availableLeads.length === 0) {
+    if (leads.length === 0) {
       mode = "new";
       selectedLeadId = "";
       return;
     }
 
-    if (
-      !selectedLeadId ||
-      !availableLeads.some((lead) => lead.id === selectedLeadId)
-    ) {
-      selectedLeadId = availableLeads[0]?.id ?? "";
+    if (!selectedLeadId || !leads.some((lead) => lead.id === selectedLeadId)) {
+      selectedLeadId = leads[0]?.id ?? "";
     }
   });
 

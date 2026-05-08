@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/svelte";
 import {
   createFormMock,
   createQueryMock,
+  createQueryResult,
 } from "../../../../test-helpers/sveltekit-mocks";
 
 const mockLeadData = {
@@ -59,12 +60,6 @@ mock.module("$app/paths", () => ({
   resolve: mockResolve,
 }));
 
-mock.module("$app/server", () => ({
-  query: (fn: (...args: unknown[]) => unknown) => fn,
-  form: () => createFormMock(),
-  getRequestEvent: () => ({}),
-}));
-
 const { default: LeadDetailPage } = await import("./+page.svelte");
 
 describe("Lead detail page", () => {
@@ -74,7 +69,7 @@ describe("Lead detail page", () => {
     mockResolve.mockClear();
     mockDeleteLead.mockClear();
     mockGetLeadData.mockImplementation(() =>
-      Promise.resolve(mockLeadData)
+      createQueryResult(mockLeadData)
     );
     mockDeleteLead.mockImplementation(() => Promise.resolve({ ok: true }));
     mockResolve.mockImplementation((path: string) => path);

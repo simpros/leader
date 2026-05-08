@@ -54,8 +54,52 @@ export const CORE_LEAD_VARIABLES: TemplateVariable[] = [
 
 export type CustomFieldValue = { name: string; value: string | null };
 
+export type TemplateVariablePreview = {
+  text: string;
+  state: "raw" | "resolved" | "missing";
+};
+
 export function customFieldToken(fieldName: string): string {
   return `{{custom.${fieldName}}}`;
+}
+
+const CORE_LEAD_VALUE_ACCESSORS: Record<
+  string,
+  (lead: Lead) => string | null | undefined
+> = {
+  "{{lead.name}}": (lead) => lead.name,
+  "{{lead.email}}": (lead) => lead.email,
+  "{{lead.phone}}": (lead) => lead.phone,
+  "{{lead.website}}": (lead) => lead.website,
+  "{{lead.address}}": (lead) => lead.address,
+  "{{lead.rating}}": (lead) =>
+    lead.rating != null ? String(lead.rating) : null,
+  "{{lead.google_maps_url}}": (lead) => lead.googleMapsUrl,
+};
+
+export function getTemplateVariablePreview(
+  variableId: string,
+  lead: Lead | null
+): TemplateVariablePreview {
+  const token = `{{${variableId}}}`;
+
+  if (!lead) {
+    return { text: token, state: "raw" };
+  }
+
+  const value = CORE_LEAD_VALUE_ACCESSORS[token]?.(lead)
+    ?.toString()
+    .trim();
+
+  if (value) {
+    return { text: value, state: "resolved" };
+  }
+
+  if (token in CORE_LEAD_VALUE_ACCESSORS) {
+    return { text: token, state: "missing" };
+  }
+
+  return { text: token, state: "raw" };
 }
 
 export function resolveTemplate(
@@ -63,20 +107,13 @@ export function resolveTemplate(
   lead: Lead,
   customFields: CustomFieldValue[]
 ): string {
-  const coreMap: Record<string, string | null | undefined> = {
-    "{{lead.name}}": lead.name,
-    "{{lead.email}}": lead.email,
-    "{{lead.phone}}": lead.phone,
-    "{{lead.website}}": lead.website,
-    "{{lead.address}}": lead.address,
-    "{{lead.rating}}": lead.rating != null ? String(lead.rating) : null,
-    "{{lead.google_maps_url}}": lead.googleMapsUrl,
-  };
-
   let result = html;
 
-  for (const [token, value] of Object.entries(coreMap)) {
-    result = result.replaceAll(token, value ?? "");
+  for (const { token } of CORE_LEAD_VARIABLES) {
+    result = result.replaceAll(
+      token,
+      CORE_LEAD_VALUE_ACCESSORS[token](lead) ?? ""
+    );
   }
 
   for (const field of customFields) {
@@ -111,28 +148,15 @@ export function findMissingPlaceholders(
   const tokens = extractPlaceholders(text);
   if (tokens.length === 0) return [];
 
-  const coreAccessors: Record<
-    string,
-    (lead: Lead) => string | null | undefined
-  > = {
-    "{{lead.name}}": (l) => l.name,
-    "{{lead.email}}": (l) => l.email,
-    "{{lead.phone}}": (l) => l.phone,
-    "{{lead.website}}": (l) => l.website,
-    "{{lead.address}}": (l) => l.address,
-    "{{lead.rating}}": (l) => (l.rating != null ? String(l.rating) : null),
-    "{{lead.google_maps_url}}": (l) => l.googleMapsUrl,
-  };
-
   const knownTokens = new Set([
-    ...Object.keys(coreAccessors),
+    ...Object.keys(CORE_LEAD_VALUE_ACCESSORS),
     ...customFields.map((f) => customFieldToken(f.name)),
   ]);
 
   const results: { token: string; missingCount: number }[] = [];
 
   for (const token of tokens) {
-    const accessor = coreAccessors[token];
+    const accessor = CORE_LEAD_VALUE_ACCESSORS[token];
     if (accessor) {
       const missing = leads.filter(
         (l) => !accessor(l)?.toString().trim()
@@ -149,6 +173,23 @@ export function findMissingPlaceholders(
   return results;
 }
 
+/**
+ * Returns all available template variables for a project,
+ * combining core lead fields and custom fields into a single list.
+ * Used by the editor toolbar dropdown and suggestion plugin.
+ */
+export function getAllTemplateVariables(
+  customFields: { name: string }[]
+): TemplateVariable[] {
+  const customItems: TemplateVariable[] = customFields.map((f) => ({
+    token: customFieldToken(f.name),
+    label: `custom.${f.name}`,
+    group: "Custom fields",
+  }));
+
+  return [...CORE_LEAD_VARIABLES, ...customItems];
+}
+
 export function highlightResolved(
   originalHtml: string,
   lead: Lead,
@@ -159,16 +200,6 @@ export function highlightResolved(
     ...customFields.map((f) => customFieldToken(f.name)),
   ];
 
-  const coreMap: Record<string, string | null | undefined> = {
-    "{{lead.name}}": lead.name,
-    "{{lead.email}}": lead.email,
-    "{{lead.phone}}": lead.phone,
-    "{{lead.website}}": lead.website,
-    "{{lead.address}}": lead.address,
-    "{{lead.rating}}": lead.rating != null ? String(lead.rating) : null,
-    "{{lead.google_maps_url}}": lead.googleMapsUrl,
-  };
-
   let result = originalHtml;
 
   for (const token of allTokens) {
@@ -176,7 +207,7 @@ export function highlightResolved(
 
     let value: string;
     if (token.startsWith("{{lead.")) {
-      value = coreMap[token] ?? "";
+      value = CORE_LEAD_VALUE_ACCESSORS[token]?.(lead) ?? "";
     } else {
       const fieldName = token.slice("{{custom.".length, -2);
       const field = customFields.find((f) => f.name === fieldName);

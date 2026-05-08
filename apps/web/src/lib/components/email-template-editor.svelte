@@ -1,11 +1,31 @@
 <script lang="ts">
-  import { Debounced } from "runed";
+  import { Debounced, watch } from "runed";
+  import { untrack } from "svelte";
+  import { Editor } from "@tiptap/core";
+  import StarterKit from "@tiptap/starter-kit";
+  import Underline from "@tiptap/extension-underline";
+  import Link from "@tiptap/extension-link";
+  import TextAlign from "@tiptap/extension-text-align";
+  import Placeholder from "@tiptap/extension-placeholder";
   import type { Lead } from "$lib/leads/types";
-  import { getProjectCustomFields } from "$lib/remote/projects.remote.js";
   import {
-    highlightResolved,
     findMissingPlaceholders,
+    getAllTemplateVariables,
+    getTemplateVariablePreview,
   } from "./template-variables.js";
+  import {
+    normalizeTemplateEditorHtml,
+    preprocessTemplateHtml,
+    postprocessTemplateHtml,
+  } from "./editor/tiptap-template-variable.js";
+  import { EmailButton } from "./editor/tiptap-email-button.js";
+  import { createVariableSuggestion } from "./editor/tiptap-variable-suggestion.js";
+  import type {
+    SuggestionCallbackProps,
+    SuggestionItem,
+  } from "./editor/tiptap-variable-suggestion.js";
+  import EditorToolbar from "./editor/editor-toolbar.svelte";
+  import EditorVariablePopup from "./editor/editor-variable-popup.svelte";
   import TemplateVariableMenu from "./template-variable-menu.svelte";
 
   type EmailTemplateEditorProps = {
@@ -28,37 +48,52 @@
     leads = [],
   }: EmailTemplateEditorProps = $props();
 
-  let viewMode = $state<"split" | "edit" | "preview">("split");
-  let selectedLeadId = $state<string | null>(null);
-  let menuOpen = $state(false);
-  let menuX = $state(0);
-  let menuY = $state(0);
-  let activeInputRef = $state<
-    HTMLTextAreaElement | HTMLInputElement | null
-  >(null);
-  let textareaRef = $state<HTMLTextAreaElement | null>(null);
+  let editorElement = $state<HTMLDivElement | null>(null);
+  let editor = $state<Editor | null>(null);
+  let editorVersion = $state(0);
+  let selectedPreviewLeadId = $state("");
   let subjectInputRef = $state<HTMLInputElement | null>(null);
 
+  // Subject input variable menu state
+  let subjectMenuOpen = $state(false);
+  let subjectMenuX = $state(0);
+  let subjectMenuY = $state(0);
+
+  // Suggestion popup state
+  let suggestionOpen = $state(false);
+  let suggestionItems = $state<SuggestionItem[]>([]);
+  let suggestionCommand = $state<((item: SuggestionItem) => void) | null>(
+    null
+  );
+  let suggestionClientRect = $state<(() => DOMRect | null) | null>(null);
+  let variablePopupRef = $state<EditorVariablePopup | null>(null);
+
+  // Prevent feedback loops when setting editor content externally
+  let isUpdatingFromEditor = false;
+
+  async function loadProjectCustomFields(projectId: string) {
+    const { getProjectCustomFields } =
+      await import("$lib/remote/projects.remote.js");
+
+    return getProjectCustomFields(projectId);
+  }
+
   const customFields = $derived(
-    projectId ? await getProjectCustomFields(projectId) : []
+    projectId ? await loadProjectCustomFields(projectId) : []
   );
 
-  const selectedLead = $derived(
-    leads.find((l) => l.id === selectedLeadId) ?? null
+  const allVariables = $derived(getAllTemplateVariables(customFields));
+  const previewableLeads = $derived(
+    leads.filter((lead): lead is Lead & { id: string } => Boolean(lead.id))
   );
 
   const debouncedValue = new Debounced(() => value, 300);
   const debouncedSubject = new Debounced(() => subject, 300);
 
-  const previewHtml = $derived.by(() => {
-    const html = debouncedValue.current;
-    if (!selectedLead) return html;
-    const fields = customFields.map((f) => ({
-      name: f.name,
-      value: null,
-    }));
-    return highlightResolved(html, selectedLead, fields);
-  });
+  const selectedPreviewLead = $derived(
+    previewableLeads.find((lead) => lead.id === selectedPreviewLeadId) ??
+      null
+  );
 
   const missingPlaceholders = $derived.by(() => {
     const combined =
@@ -66,24 +101,153 @@
     return findMissingPlaceholders(combined, leads, customFields);
   });
 
-  const toggleView = (mode: "split" | "edit" | "preview") => {
-    viewMode = mode;
-  };
-
-  const handleKeydown = (event: KeyboardEvent) => {
-    if (
-      (event.metaKey || event.ctrlKey) &&
-      event.shiftKey &&
-      event.key === "P"
-    ) {
-      event.preventDefault();
-      toggleView(viewMode === "preview" ? "split" : "preview");
+  watch(() => previewableLeads, (leads) => {
+    if (selectedPreviewLeadId && !leads.some((lead) => lead.id === selectedPreviewLeadId)) {
+      selectedPreviewLeadId = "";
     }
-  };
+  }, { lazy: true });
 
-  function getCursorPixelPosition(
-    el: HTMLTextAreaElement | HTMLInputElement
-  ): { x: number; y: number } {
+  function updateTemplateVariablePreview() {
+    if (!editorElement) return;
+
+    const variableNodes = editorElement.querySelectorAll<HTMLElement>(
+      '[data-type="template-variable"]'
+    );
+
+    for (const node of variableNodes) {
+      const variableId = node.dataset.variableId;
+      if (!variableId) continue;
+
+      const preview = getTemplateVariablePreview(
+        variableId,
+        selectedPreviewLead
+      );
+
+      node.textContent = preview.text;
+      node.dataset.previewState = preview.state;
+      node.title = `{{${variableId}}}`;
+    }
+  }
+
+  // Initialize TipTap editor
+  $effect(() => {
+    const mountElement = editorElement;
+    if (!mountElement) return;
+
+    return untrack(() => {
+      const initialPlaceholder =
+        placeholder ?? "Start writing your email...";
+      const initialContent = preprocessTemplateHtml(value);
+
+      const TemplateVariableWithSuggestion = createVariableSuggestion({
+        getVariables: () => getAllTemplateVariables(customFields),
+        onStart: (props: SuggestionCallbackProps) => {
+          suggestionItems = props.items;
+          suggestionCommand = props.command;
+          suggestionClientRect = props.clientRect;
+          suggestionOpen = true;
+        },
+        onUpdate: (props: SuggestionCallbackProps) => {
+          suggestionItems = props.items;
+          suggestionCommand = props.command;
+          suggestionClientRect = props.clientRect;
+        },
+        onExit: () => {
+          suggestionOpen = false;
+          suggestionItems = [];
+          suggestionCommand = null;
+          suggestionClientRect = null;
+        },
+        onKeyDown: (event: KeyboardEvent) => {
+          if (!variablePopupRef) return false;
+          return variablePopupRef.handleKeyDown(event);
+        },
+      });
+
+      const instance = new Editor({
+        element: mountElement,
+        extensions: [
+          StarterKit.configure({
+            heading: { levels: [1, 2, 3] },
+            link: false,
+            underline: false,
+          }),
+          Underline,
+          Link.configure({
+            openOnClick: false,
+            HTMLAttributes: {
+              rel: "noopener noreferrer",
+              target: "_blank",
+            },
+          }),
+          TextAlign.configure({
+            types: ["heading", "paragraph"],
+          }),
+          Placeholder.configure({
+            placeholder: initialPlaceholder,
+          }),
+          TemplateVariableWithSuggestion,
+          EmailButton,
+        ],
+        content: initialContent,
+        onUpdate: ({ editor: ed }) => {
+          isUpdatingFromEditor = true;
+          value = normalizeTemplateEditorHtml(
+            postprocessTemplateHtml(ed.getHTML())
+          );
+          editorVersion++;
+          isUpdatingFromEditor = false;
+        },
+        onTransaction: () => {
+          // Force Svelte to re-render toolbar active states
+          editorVersion++;
+        },
+      });
+
+      editor = instance;
+
+      return () => {
+        instance.destroy();
+        editor = null;
+      };
+    });
+  });
+
+  // Sync external value changes into the editor (e.g. AI-generated drafts)
+  // lazy: true — editor is null on init and isUpdatingFromEditor guards internal updates
+  watch(() => value, (nextRaw) => {
+    if (!editor || isUpdatingFromEditor) return;
+
+    const currentHtml = normalizeTemplateEditorHtml(
+      postprocessTemplateHtml(editor.getHTML())
+    );
+    const nextValue = normalizeTemplateEditorHtml(nextRaw);
+
+    if (currentHtml !== nextValue) {
+      // setContent triggers onTransaction (editorVersion++); without untrack this
+      // effect would re-run on every transaction — infinite loop.
+      untrack(() => {
+        editor!.commands.setContent(preprocessTemplateHtml(nextValue), {
+          emitUpdate: false,
+        });
+        editorVersion++;
+      });
+    }
+  }, { lazy: true });
+
+  watch([() => selectedPreviewLead, () => editorVersion], () => {
+    updateTemplateVariablePreview();
+  });
+
+  // Hidden input for form submission
+  const hiddenName = $derived(name);
+  const hiddenValue = $derived(value);
+
+  // Subject input variable autocomplete (kept from original)
+  function getCursorPixelPosition(el: HTMLInputElement): {
+    x: number;
+    y: number;
+  } {
     const rect = el.getBoundingClientRect();
     const mirror = document.createElement("div");
     const style = window.getComputedStyle(el);
@@ -115,56 +279,40 @@
     const mirrorRect = mirror.getBoundingClientRect();
     document.body.removeChild(mirror);
 
-    const scrollTop = el instanceof HTMLTextAreaElement ? el.scrollTop : 0;
-
     return {
       x: rect.left + (cursorRect.left - mirrorRect.left),
-      y: rect.top + (cursorRect.top - mirrorRect.top) - scrollTop + 20,
+      y: rect.top + (cursorRect.top - mirrorRect.top) + 20,
     };
   }
 
-  function checkForDoubleBrace(
-    el: HTMLTextAreaElement | HTMLInputElement
-  ): boolean {
+  function checkForDoubleBrace(el: HTMLInputElement): boolean {
     const pos = el.selectionStart ?? 0;
     return pos >= 2 && el.value.slice(pos - 2, pos) === "{{";
   }
 
-  function handleInput(
-    event: Event & {
-      currentTarget: HTMLTextAreaElement | HTMLInputElement;
-    }
+  function handleSubjectInput(
+    event: Event & { currentTarget: HTMLInputElement }
   ) {
     const el = event.currentTarget;
     if (checkForDoubleBrace(el)) {
       const pos = getCursorPixelPosition(el);
-      menuX = pos.x;
-      menuY = pos.y;
-      activeInputRef = el;
-      menuOpen = true;
+      subjectMenuX = pos.x;
+      subjectMenuY = pos.y;
+      subjectMenuOpen = true;
     }
   }
 
-  function insertToken(token: string) {
-    const el = activeInputRef;
+  function insertSubjectToken(token: string) {
+    const el = subjectInputRef;
     if (!el) {
-      menuOpen = false;
+      subjectMenuOpen = false;
       return;
     }
 
     const pos = el.selectionStart ?? 0;
     const before = el.value.slice(0, pos - 2);
     const after = el.value.slice(pos);
-    const newValue = before + token + after;
-
-    if (el === textareaRef) {
-      value = newValue;
-    } else if (el === subjectInputRef) {
-      subject = newValue;
-    } else {
-      el.value = newValue;
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    }
+    subject = before + token + after;
 
     const newPos = before.length + token.length;
     requestAnimationFrame(() => {
@@ -172,27 +320,38 @@
       el.setSelectionRange(newPos, newPos);
     });
 
-    menuOpen = false;
+    subjectMenuOpen = false;
   }
 
-  function closeMenu() {
-    menuOpen = false;
+  function closeSubjectMenu() {
+    subjectMenuOpen = false;
   }
-
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
-
+<!-- Subject input variable menu (plain text input, kept as-is) -->
 <TemplateVariableMenu
-  open={menuOpen}
-  x={menuX}
-  y={menuY}
+  open={subjectMenuOpen}
+  x={subjectMenuX}
+  y={subjectMenuY}
   {customFields}
-  onInsert={insertToken}
-  onClose={closeMenu}
+  onInsert={insertSubjectToken}
+  onClose={closeSubjectMenu}
 />
 
+<!-- Suggestion popup for body editor -->
+{#if suggestionOpen && suggestionCommand}
+  <EditorVariablePopup
+    bind:this={variablePopupRef}
+    items={suggestionItems}
+    command={suggestionCommand}
+    clientRect={suggestionClientRect}
+  />
+{/if}
+
 <div class="flex flex-col gap-3">
+  <!-- Hidden input for form submission -->
+  <input type="hidden" name={hiddenName} value={hiddenValue} />
+
   {#if subjectName !== undefined}
     <div class="flex flex-col gap-1.5">
       <span class="text-sm font-semibold text-neutral-700"
@@ -204,143 +363,63 @@
         name={subjectName}
         type="text"
         placeholder="e.g. Quick intro from Leader"
-        oninput={handleInput}
-        class="border-primary-200/70 focus-visible:border-primary-300 focus-visible:ring-primary-400/30 h-10 w-full rounded-xl border bg-white/90 px-3 py-2 text-sm text-neutral-900 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        oninput={handleSubjectInput}
+        class="bg-surface focus-visible:border-primary-600 focus-visible:ring-primary-400/40 h-10 w-full border-2 border-neutral-800 px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       />
     </div>
   {/if}
 
   <div class="flex flex-wrap items-center justify-between gap-2">
-    <div class="flex flex-wrap items-center gap-2">
-      <div
-        class="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1"
-        role="toolbar"
-        aria-label="View mode toolbar"
-      >
-        <button
-          type="button"
-          onclick={() => toggleView("edit")}
-          class={[
-            "rounded px-3 py-1.5 text-xs font-medium transition-colors",
-            viewMode === "edit"
-              ? "bg-secondary-100 text-secondary-800"
-              : "text-neutral-600 hover:bg-neutral-50",
-          ]}
+    <span class="text-sm font-semibold text-neutral-700">Email Body</span>
+    <div class="flex flex-wrap items-center gap-3">
+      {#if previewableLeads.length > 0}
+        <label
+          class="flex items-center gap-2 text-xs font-medium text-neutral-600"
         >
-          Edit
-        </button>
-        <button
-          type="button"
-          onclick={() => toggleView("split")}
-          class={[
-            "rounded px-3 py-1.5 text-xs font-medium transition-colors",
-            viewMode === "split"
-              ? "bg-secondary-100 text-secondary-800"
-              : "text-neutral-600 hover:bg-neutral-50",
-          ]}
-        >
-          Split
-        </button>
-        <button
-          type="button"
-          onclick={() => toggleView("preview")}
-          class={[
-            "rounded px-3 py-1.5 text-xs font-medium transition-colors",
-            viewMode === "preview"
-              ? "bg-secondary-100 text-secondary-800"
-              : "text-neutral-600 hover:bg-neutral-50",
-          ]}
-        >
-          Preview
-        </button>
-      </div>
-
-      {#if leads.length > 0}
-        <div class="flex items-center gap-1.5">
-          <label
-            for="preview-lead-select"
-            class="text-xs font-medium text-neutral-500"
-          >
-            Preview as:
-          </label>
+          <span>Preview lead</span>
           <select
-            id="preview-lead-select"
-            bind:value={selectedLeadId}
-            class="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-700 focus:ring-2 focus:ring-neutral-300 focus:ring-offset-1 focus:outline-none"
+            bind:value={selectedPreviewLeadId}
+            class="bg-surface h-8 border-2 border-neutral-800 px-2 font-mono text-xs text-neutral-900"
           >
-            <option value={null}>— no lead —</option>
-            {#each leads as lead (lead.placeId)}
+            <option value="">No preview</option>
+            {#each previewableLeads as lead (lead.id)}
               <option value={lead.id}>{lead.name}</option>
             {/each}
           </select>
-        </div>
+        </label>
       {/if}
-    </div>
 
-    <div class="text-xs text-neutral-500">
-      {value.length} characters
+      <div class="text-xs text-neutral-500">
+        {value.length} characters
+      </div>
     </div>
   </div>
 
-  <div
-    class={[
-      "grid gap-3",
-      viewMode === "split" ? "lg:grid-cols-2" : "grid-cols-1",
-    ]}
-  >
-    {#if viewMode === "edit" || viewMode === "split"}
-      <div class="flex flex-col gap-2">
-        <span class="text-sm font-semibold text-neutral-700">
-          HTML Editor
-        </span>
-        <textarea
-          bind:this={textareaRef}
-          bind:value
-          {name}
-          {placeholder}
-          oninput={handleInput}
-          class="border-primary-200/70 focus-visible:border-primary-300 focus-visible:ring-primary-400/30 min-h-96 w-full rounded-xl border bg-white/90 px-3 py-2 font-mono text-sm text-neutral-900 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-        ></textarea>
-      </div>
+  <div class="flex flex-col gap-0">
+    <!-- Editor toolbar + content area -->
+    {#if editor}
+      <EditorToolbar
+        {editor}
+        variables={allVariables}
+        version={editorVersion}
+      />
     {/if}
 
-    {#if viewMode === "preview" || viewMode === "split"}
-      <div class="flex flex-col gap-2">
-        <span class="text-sm font-semibold text-neutral-700">
-          Email Preview
-        </span>
-        <div
-          class="border-primary-200/70 min-h-96 w-full overflow-auto rounded-xl border bg-neutral-50 px-6 py-4"
-        >
-          <div class="mx-auto max-w-[600px]">
-            {#if previewHtml.trim()}
-              <!-- Intentional HTML rendering for email preview - content is user-controlled -->
-              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-              {@html previewHtml}
-            {:else}
-              <p class="text-sm text-neutral-400 italic">
-                Preview will appear here as you type...
-              </p>
-            {/if}
-          </div>
-        </div>
-      </div>
-    {/if}
+    <div
+      bind:this={editorElement}
+      class="tiptap-editor border-2 border-neutral-800 bg-white"
+    ></div>
   </div>
 
   {#if missingPlaceholders.length > 0}
-    <div
-      class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5"
-    >
-      <p class="text-sm font-medium text-amber-800">
-        ⚠ Some placeholders have missing data
+    <div class="border-2 border-amber-600 bg-amber-50 px-3 py-2.5">
+      <p class="text-sm font-bold tracking-wider text-amber-800 uppercase">
+        Missing placeholder data
       </p>
       <ul class="mt-1 space-y-0.5">
         {#each missingPlaceholders as { token, missingCount } (token)}
           <li class="text-xs text-amber-700">
-            <code class="rounded bg-amber-100 px-1 py-0.5 font-mono"
-              >{token}</code
-            >
+            <code class="bg-amber-100 px-1 py-0.5 font-mono">{token}</code>
             — empty for {missingCount} of {leads.length} lead{leads.length ===
             1
               ? ""
@@ -352,8 +431,11 @@
   {/if}
 
   <p class="text-xs text-neutral-400">
-    Tip: type <code class="rounded bg-neutral-100 px-1 py-0.5 font-mono"
+    Tip: type <code class="bg-neutral-100 px-1 py-0.5 font-mono"
       >&#123;&#123;</code
-    > in the subject or body to insert a variable (e.g. lead name, address).
+    >
+    in the body to insert a variable, or use the
+    <code class="bg-neutral-100 px-1 py-0.5 font-mono">&#123;&#123;</code>
+    toolbar button.
   </p>
 </div>
