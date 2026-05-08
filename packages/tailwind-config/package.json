@@ -1,7 +1,6 @@
 {
   "name": "@leader/tailwind-config",
   "private": true,
-  "version": "0.0.1",
   "type": "module",
   "main": "./tailwind.config.ts",
   "types": "./tailwind.config.ts",

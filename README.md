@@ -251,7 +251,7 @@ bun run db:studio     # Open Drizzle Studio
 Docker images are published automatically when you push a git tag:
 
 ```bash
-# Tag a release (uses apps/web/package.json version)
+# Tag a release
 git tag web@0.1.0
 git push origin web@0.1.0
 ```
