@@ -41,7 +41,7 @@
     "@types/nodemailer": "^7.0.10",
     "better-auth": "1.4.18",
     "bits-ui": "^2.16.2",
-    "drizzle-orm": "1.0.0-beta.15-859cf75",
+    "drizzle-orm": "1.0.0-rc.4-5d5b77c",
     "nodemailer": "^8.0.1",
     "runed": "^0.37.1",
     "svelte": "5.53.6",
